@@ -1,0 +1,4 @@
+fastapi==0.111.0
+pydantic==2.5.3
+openai==1.8.0
+qdrant-client==1.8.0
