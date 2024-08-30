@@ -1,0 +1,10 @@
+fastapi==0.103.0
+psycopg[pool]==3.1.17
+sse-starlette==1.8.2
+psycopg2==2.9.9
+tomark==0.1.4
+langchain
+langchain-core
+langchain-experimental
+langchain-openai
+uvicorn
