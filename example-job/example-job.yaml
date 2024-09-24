@@ -5,4 +5,4 @@ pipeline:
   - name: "test job run"
     type: "py"
     port: 8787
-    bash_script_path: "example-job/example-job.py"
+    py_path: "example-job/example-job.py"
