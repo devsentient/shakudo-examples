@@ -1,0 +1,8 @@
+pipeline:
+  name: "test job name"
+  requirements: "example-job/requirement.txt"
+  tasks:
+  - name: "test job run"
+    type: "py"
+    port: 8787
+    bash_script_path: "example-job/example-job.py"
