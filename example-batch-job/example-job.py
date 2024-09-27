@@ -5,8 +5,8 @@ from io import BytesIO
 time.sleep(10)
 
 MINIO_ENDPOINT = "minio.hyperplane-minio.svc.cluster.local:9000"
-MINIO_ACCESS_KEY = "Czy6vrABD9QwSgHDemVj"
-MINIO_SECRET_KEY = "6YkuLLYe30GMy4SFrNlGAt2r2GTGakjOedJEfBnh"
+MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY')
+MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
 
 minio_client = Minio(
     MINIO_ENDPOINT,
