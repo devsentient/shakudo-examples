@@ -7,6 +7,7 @@ graphql_endpoint = "http://api-server.hyperplane-core.svc.cluster.local:80/graph
 
 def get_add_job_mutation():
     uuid_value = str(uuid.uuid4())[:18]
+    file_name = f"{uuid_value}.txt"
     add_job_mutation = f"""
     mutation {{
         createPipelineJobWithAlerting(
@@ -15,14 +16,13 @@ def get_add_job_mutation():
                 jobType: "lite",
                 pipelineYamlPath: "example-batch-job/run.sh",
                 noHyperplaneCommands: false,
-                workingDir: "/tmp/git/monorepo/",
                 debuggable: false,
                 notificationsEnabled: false,
                 notificationTargetIds: [],
                 timeout: 86400,
                 activeTimeout: 86400,
                 maxRetries: 1,
-                gitServerName: "shakudo-examples",
+                gitServerName: "test-pub",
                 noGitInit: false,
                 commitId: "",
                 hyperplaneUserEmail: "yushuo@shakudo.io",
@@ -30,7 +30,9 @@ def get_add_job_mutation():
                 pipelineType: "BASH",
                 branchName: "example-batch-job",
                 parameters: {{ create: [
-                    {{ key: "FILE_ID", value: "{uuid_value}" }}
+                    {{ key: "FILE_ID", value: "{uuid_value}" }},
+                    {{ key: "MINIO_ACCESS_KEY", value: "5fDcdMMayNJkFWZlL9aD" }},
+                    {{ key: "MINIO_SECRET_KEY", value: "XzImiZeh0uBGEUACH8RPAoFqrxNnHISF9x8XqoQ4" }}
                 ] }}
             }}
         ) {{
@@ -38,7 +40,6 @@ def get_add_job_mutation():
             jobName
             jobType
             pipelineYamlPath
-            workingDir
             commitId
             branchName
             debuggable
@@ -49,7 +50,7 @@ def get_add_job_mutation():
         }}
     }}
     """
-    return add_job_mutation
+    return add_job_mutation, file_name
 
 count_inprogress_query = """
 query {
@@ -79,12 +80,14 @@ def send_graphql_request(query):
         return None
 
 def main():
-    total_jobs_to_send = 1000
+    total_jobs_to_send = 2000
     jobs_sent = 0
-
+    job_name_list = []
     # Send 100 jobs
     for _ in range(100):
-        send_graphql_request(get_add_job_mutation())
+        m, fname = get_add_job_mutation()
+        job_name_list.append(fname)
+        send_graphql_request(m)
         jobs_sent += 1
         print(f"Sent job {jobs_sent}/{total_jobs_to_send}")
 
@@ -105,12 +108,20 @@ def main():
         if total_jobs_in_progress_or_pending < 100:
             jobs_to_send = 100 - total_jobs_in_progress_or_pending
             for _ in range(jobs_to_send):
-                send_graphql_request(get_add_job_mutation())
+                m, fname = get_add_job_mutation()
+                job_name_list.append(fname)
+                send_graphql_request(m)
                 jobs_sent += 1
                 print(f"Sent job {jobs_sent}/{total_jobs_to_send}")
 
         # Wait for 30 seconds before the next query
         time.sleep(30)
+    
+    file_name = "job_names.txt"
+
+    with open(file_name, 'w') as file:
+        for job_name in job_name_list:
+            file.write(job_name + '\n')
 
 if __name__ == "__main__":
     main()
