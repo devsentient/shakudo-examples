@@ -1,7 +1,6 @@
 from minio import Minio
-import time
+import time, os
 from io import BytesIO
-import uuid
 
 time.sleep(10)
 
@@ -17,8 +16,8 @@ minio_client = Minio(
 )
 
 bucket_name = "batch-job-test"
-file_uuid = str(uuid.uuid4())
-object_name = f"{file_uuid}.txt" 
+file_id = os.getenv('FILE_ID')
+object_name = f"{file_id}.txt" 
 file_content = f"Hello, MinIO! This is a test string in {object_name}."  
 file_data = BytesIO(file_content.encode('utf-8'))
 
