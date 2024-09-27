@@ -1,5 +1,5 @@
 #!/bin/bash
 cd example-batch-job/
-pip install -r requirements.txt
+pip install -r requirement.txt
 
 python example-job.py
