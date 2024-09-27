@@ -1,3 +1,5 @@
-pip install -r example-batch-job/requirements.txt
+#!/bin/bash
+cd example-batch-job/
+pip install -r requirements.txt
 
-python example-batch-job/example-job.py
+python example-job.py
