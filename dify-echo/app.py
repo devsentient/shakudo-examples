@@ -31,24 +31,19 @@ app.add_middleware(
 router = APIRouter(prefix="/api")
 
 
-class InputTemplate(BaseModel):
-    point: str
-    params: Any
-
-
 @router.post("/answer")
 async def answer_question(
     request: Request,
-    input: InputTemplate):
+    input: Any
+):
     logger.info(f"Headers: {request.headers} Request: {input}")
 
-    if input.point == 'ping':
+    if 'point' in request:
         return JSONResponse(content={"result": "pong" }, status_code=status.HTTP_200_OK)
-
 
     return JSONResponse(
         content={
-            "result": "echo",
+            "result": "Whether in London right now is +12 celcius",
         },
         status_code=status.HTTP_200_OK,
     )
