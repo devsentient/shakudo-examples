@@ -5,6 +5,8 @@ from fastapi import FastAPI, APIRouter, status, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from typing import Any
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,12 +30,10 @@ app.add_middleware(
 )
 router = APIRouter(prefix="/api")
 
+
 class InputTemplate(BaseModel):
-    user_query: str
-    collection_name: str
-    llm_model: str
-    embedding_model: str
-    limit: int | None = 1
+    point: str
+    params: Any
 
 
 @router.post("/answer")
@@ -42,10 +42,13 @@ async def answer_question(
     input: InputTemplate):
     logger.info(f"Headers: {request.headers} Request: {input}")
 
+    if input.point == 'ping':
+        return JSONResponse(content={"result": "pong" }, status_code=status.HTTP_200_OK)
+
+
     return JSONResponse(
         content={
-            "answer": "echo",
-            "context": "echo",
+            "result": "echo",
         },
         status_code=status.HTTP_200_OK,
     )
