@@ -3,20 +3,11 @@ from langchain_community.graphs import Neo4jGraph
 from neo4j import GraphDatabase
 from glob import glob
 from tqdm import tqdm
-from langchain_core.documents import Document
-from langchain_community.embeddings.ollama import OllamaEmbeddings
-from langchain_community.chat_models.ollama import ChatOllama
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from prompts import PROMPT_QUESTION
+from prompts import PROMPT_EXTRACT, PROMPT_QU_QWEN
 
 
-def uniform_grab_value(x):
-  if hasattr(x, "content"):
-    value = x.content
-  else:
-    value = x
-  return value
 
 neo4j_params = {
   "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
@@ -35,37 +26,46 @@ driver = GraphDatabase.driver(
   auth=(neo4j_params['user'], neo4j_params['password'])
 )
 
-try: 
-  graph.query("RETURN 1;")
-  print("Connection to neo4j is successful.")
-except Exception as e:
-  print("Connection to neo4j is unsuccessful. Please check your configurations. Trace: \n")
-  raise Exception(str(e))
-  
+def uniform_grab_value(x):
+    if hasattr(x, "content"):
+        value = x.content
+    else:
+        value = x
+    return value
 
+try: 
+    graph.query("RETURN 1;")
+    print("Connection to neo4j is successful.")
+except Exception as e:
+    print("Connection to neo4j is unsuccessful. Please check your configurations. Trace: \n")
+    raise Exception(str(e))
+  
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.chat_models import ChatOllama
 
 OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
 OLLAMA_EMBEDDING_ENDPOINT="http://ollama-nomic.hyperplane-ollama.svc.cluster.local:11434"
 
-OLLAMA_LLM = 'qwen2.5:14b-instruct-q4_K_M'
-OLLAMA_LLM_ENDPOINT = "http://ollama.hyperplane-ollama.svc.cluster.local:11434"
-
-embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, model=OLLAMA_EMBEDDING_MODEL, num_ctx=8192)
-llm_model = ChatOllama(base_url=OLLAMA_LLM_ENDPOINT, model=OLLAMA_LLM, num_ctx=8192)
+OLLAMA_LLM = 'qwen2.5:14b-instruct-q4_K_S'
+OLLAMA_LLM_ENDPOINT = "http://ollama-sqlcoder.hyperplane-ollama.svc.cluster.local:11434"
 
 embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
                                    model=OLLAMA_EMBEDDING_MODEL, 
                                    num_ctx=8196)
+llm_model = ChatOllama(base_url=OLLAMA_LLM_ENDPOINT, model=OLLAMA_LLM, num_ctx=32768)
 
+from langchain_core.documents import Document
 
-
-files = glob('***')
-p_text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100)
-c_text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
+files = glob('/root/client/extractor_job_v2/md_files/*/*.md')
+p_text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+c_text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=100)
 
 for file_path in tqdm(files):
   filename = file_path.split('/')[-1].split('.')[0]
-  print(filename)
+  
+  formatted_prompt = PROMPT_QU_QWEN.format(name=filename)
+  date = uniform_grab_value(llm_model.invoke(formatted_prompt))
+  
   with open(file_path) as fp:
     text = fp.read()
 
@@ -78,29 +78,31 @@ for file_path in tqdm(files):
   p_doc_chunks = p_text_splitter.split_documents(parent_docs)
 
   for id, p_chunk in enumerate(p_doc_chunks):
-    
-    p_embedding = embedding_model.embed_query(p_chunk.page_content)
-    child_documents = c_text_splitter.split_documents([p_chunk])
-    
-    formatted_prompt = PROMPT_QUESTION.format_prompt(document=p_chunk.page_content, name=filename)
-    responses = uniform_grab_value(llm_model.invoke(formatted_prompt))
-    questions = responses.splitlines()
-    
+    formatted_prompt = PROMPT_QU_QWEN.format(doument=p_chunk.page_content, name=date)
+    questions = uniform_grab_value(llm_model.invoke(formatted_prompt))
+    questions = questions.splitlines()
+    if len(questions) != 5:
+      questions = [''] * 5
+      
     q_nodes = []
-    for iq, question in enumerate(questions):
-      q_embedding = embedding_model.embed_query(question)
+    q_embeddings = embedding_model.embed_documents(questions)
+    for iq, (question, q_embedding) in enumerate(zip([questions, q_embeddings])):
       q_data = {
         'text': question,
         'id': f'{filename}-{id}-q{iq}',
         'embedding': q_embedding
       }
       q_nodes.append(q_data)
+      
+    p_embedding = embedding_model.embed_query(p_chunk.page_content)
+    child_documents = c_text_splitter.split_documents([p_chunk])
     
     children = []
-    for ic, c in enumerate(child_documents):
-      c_embedding = embedding_model.embed_query(c.page_content)
+    text_childrens = [c.page_content for c in child_documents]
+    c_embeddings = embedding_model.embed_documents(text_childrens)
+    for ic, (c_text, c_embedding) in enumerate(zip(text_childrens, c_embeddings)):
       child_data = {
-        'text': c.page_content,
+        'text': c_text,
         'id': f"{filename}-{id}-{ic}",
         'embedding': c_embedding,
       }
@@ -113,7 +115,7 @@ for file_path in tqdm(files):
       "children": children,
       "id": f'{filename}-{id}',
       "filename": filename,
-      "questions": q_nodes,
+      "date": date
     }
     
     graph.query(
@@ -121,7 +123,7 @@ for file_path in tqdm(files):
       MERGE (p:Page {{id: $id}})
       SET p.text = $text,
           p.page_number = $page_number,
-          p:{filename}
+          p:{date}
       WITH p
       CALL db.create.setVectorProperty(p, 'embedding', $embedding)
       YIELD node
@@ -129,7 +131,7 @@ for file_path in tqdm(files):
       UNWIND $children AS chunk
       MERGE (c:Chunk {{id: chunk.id}})
       SET c.text = chunk.text,
-          c:{filename}
+          c:{date}
       MERGE (c)<-[:HAS_CHILD]-(p)
       WITH c, chunk
       CALL db.create.setVectorProperty(c, 'embedding', chunk.embedding)
@@ -138,16 +140,15 @@ for file_path in tqdm(files):
       """,
       parent
     )
-  
-  graph.query(
+    
+    graph.query(
       f"""
       MERGE (p:Page {{id: $id}})
       WITH p
       UNWIND $questions as question
       MERGE (q: Question {{id: question.id}})
       SET q.text = question.text,
-          q:avenue,
-          q:{filename}
+          q:{date}
       MERGE (q)<-[:HAS_QUESTION]-(p)
       WITH q, question
       CALL db.create.setVectorProperty(q, 'embedding', question.embedding)
@@ -156,6 +157,7 @@ for file_path in tqdm(files):
       """,
       parent
     )
+    print('question done')
     
 graph.query(
   "CALL db.index.vector.createNodeIndex('chunk', 'Chunk', 'embedding', $dimension, 'cosine')",

@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Request
 import os, re
-from neo4j import GraphDatabase
-from langchain_community.embeddings.ollama import OllamaEmbeddings
-from langchain_community.chat_models.ollama import ChatOllama
+from fastapi.responses import JSONResponse
+from neo4j import GraphDatabase, AsyncGraphDatabase
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.chat_models import ChatOllama
 
 from prompts import PROMPT_QWEN
+
 
 app = FastAPI()
 
@@ -16,7 +18,7 @@ neo4j_params = {
 }
 
 
-driver = GraphDatabase.driver(
+driver = AsyncGraphDatabase.driver(
     f"{neo4j_params['URL']}",
     auth=(neo4j_params['user'], neo4j_params['password'])
 )
@@ -28,8 +30,8 @@ OLLAMA_EMBEDDING_ENDPOINT="http://ollama-nomic.hyperplane-ollama.svc.cluster.loc
 embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
                                    model=OLLAMA_EMBEDDING_MODEL, 
                                    num_ctx=8196)
-chat_model = ChatOllama(base_url='http://ollama.hyperplane-ollama.svc.cluster.local:11434',
-                        model='qwen2.5:14b-instruct-q4_K_M',
+chat_model = ChatOllama(base_url='http://ollama-sqlcoder.hyperplane-ollama.svc.cluster.local:11434',
+                        model='qwen2.5:14b-instruct-q4_K_S',
                         num_ctx=8196)
 
 def uniform_grab_value(x):
@@ -42,9 +44,6 @@ def uniform_grab_value(x):
 neo4j_query = """
   CALL {
     match (page_node: Page)
-    where (
-      $filename in labels(page_node)
-    )
     with page_node,
         vector.similarity.cosine(page_node.embedding, $prompt_embedding) as score
     order by score desc
@@ -54,17 +53,16 @@ neo4j_query = """
     union all
     
     match (chunk_node: Chunk)-[:HAS_CHILD]->(page_node:Page)
-    where (
-      $filename in labels(chunk_node)
-    )
     with page_node, vector.similarity.cosine(chunk_node.embedding, $prompt_embedding) as score
     order by score desc
     limit $inner_K
     return page_node, score
     
+    union all
+    
     match (question_node: Question)-[:HAS_QUESTION]->(page_node:Page)
     where (
-      $filename in labels(question_node)
+      $date in labels(question_node)
     )
     with page_node, vector.similarity.cosine(question_node.embedding, $prompt_embedding) as score
     order by score desc
@@ -94,15 +92,12 @@ async def retrieve_context(query, document):
     'filename': document
   }
   
-  with driver.session() as sess:
-    result = sess.run(neo4j_query, parameters)
+  async with driver.session() as sess:
+    result = await sess.run(neo4j_query, parameters)
   
   result = sorted(result, key=lambda x: x['score'], reverse=True)
   
-  matched_texts =  "  \n\n---\n\n  ".join([
-              f" ON PAGE {pl['page_number']}: \n"
-              + re.sub(r' {3,}', ' ', pl["text"]) +
-              f"\n ON PAGE: {pl['page_number']}"
+  matched_texts =  "  \n\n---\n\n  ".join([ re.sub(r' {3,}', ' ', pl["text"])
               for pl in result])
   return matched_texts
   
@@ -122,5 +117,4 @@ async def get_answer(req: Request, query: str, document: str):
   return {
     'response': response
   }
-
   

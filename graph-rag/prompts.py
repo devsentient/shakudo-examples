@@ -33,20 +33,18 @@ NOTE that:
 PROMPT_QWEN = PromptTemplate(template=QWEN2_PROMPT_TEMPLATE, 
                              input_variables=['document', 'question'])
 
-
-QWEN2_QUESTION_TEMPLATE = """
+QWEN2_QU_PROMPT_TEMPLATE = """
 <|im_start|>system
 You are a financial assistant who knows to read and understand the financial reports of a company.
 You will help to generate questions that can be answered with the infomation in the text chunk.
 There are some guidelines:
 1. The question has to be from short to middle length, which reflects how people normally ask for information.
-2. The question has to mention document name in a natural way so that we could differentiate between different documents, 
-but please not quote a full document name, since it doesn't sound natural anymore. 
+2. The question has to mention the given date in a natural way
 And if the question has month information, it has to include year as well
-    E.g: from QuarterlyActivitiesJun2023, you can ask "in the quarter of June 2023"
+    E.g: from Jun_2023, you can ask "in the quarter of June 2023" or "in June 2023"
 3. Please prioritize questions that ask for financial numbers.
 4. Please do not generate yes/no question.
-5. Always generate for 10 questions
+5. Always generate 5 questions
 
 From the provided document, there might be a table with markdown format as in:
 
@@ -56,7 +54,7 @@ From the provided document, there might be a table with markdown format as in:
 Please generate each question in a new line.
 <|im_end|>
 <|im_start|>user
-This is the document name: {name}
+This is the given date: {date}
 From the text chunk:
 {document}
 
@@ -67,5 +65,22 @@ Please generate the questions.
 <|im_start|> assistant
 """
 
-PROMPT_QUESTION = PromptTemplate(template=QWEN2_QUESTION_TEMPLATE, 
+PROMPT_QU_QWEN = PromptTemplate(template=QWEN2_QU_PROMPT_TEMPLATE, 
                              input_variables=['document', 'name'])
+
+QWEN2_EXTRACT_TEMPLATE = """
+<|im_start|>system
+Given document name, extract the month and year it is about. The output have to be in the format "Month_Year". E.g January_2022 or December_2024
+If the title doesn't contain this information, return "" (empty string)
+
+<|im_end|>
+<|im_start|>user
+This is the document name: {name}
+Extract month and year
+
+<|im_end|>
+<|im_start|> assistant
+"""
+
+PROMPT_EXTRACT = PromptTemplate(template=QWEN2_EXTRACT_TEMPLATE, 
+                             input_variables=['name'])
