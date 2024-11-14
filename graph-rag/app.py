@@ -9,8 +9,9 @@ from prompts import PROMPT_QWEN, PROMPT_OPENAI
 
 app = FastAPI()
 
-
-
+#=========================|
+#  Configure Neo4j        |
+#=========================|
 
 neo4j_params = {
   "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
@@ -18,12 +19,14 @@ neo4j_params = {
   "password": os.environ.get('NEO4J_PASSWORD', "Shakudo312!")
 }
 
-
 driver = GraphDatabase.driver(
     f"{neo4j_params['URL']}",
     auth=(neo4j_params['user'], neo4j_params['password'])
 )
 
+#=========================|
+#  Configure Ollama       |
+#=========================|
 
 OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
 OLLAMA_EMBEDDING_ENDPOINT="http://ollama-cpu.hyperplane-ollama.svc.cluster.local:11434"
@@ -35,10 +38,18 @@ chat_model = ChatOllama(base_url='http://ollama.hyperplane-ollama.svc.cluster.lo
                         model='qwen2.5:14b-instruct-q4_K_M',
                         num_ctx=8196)
 
+#=========================|
+#  Configure OpenAI       |
+#=========================|
+
 ### For OpenAI users, please set the value for `OPENAI_API_KEY` environment variable and uncomment these following lines:
 #   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
 #   chat_model = ChatOpenAI(model='gpt-4o')
 
+
+#=====================================|
+#  queries and retrieval for answers  |
+#=====================================|
 
 def uniform_grab_value(x):
     if hasattr(x, "content"):
