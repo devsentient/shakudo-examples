@@ -1,13 +1,20 @@
 from fastapi import FastAPI, Request
 import os, re
 from fastapi.responses import JSONResponse
-from neo4j import GraphDatabase, AsyncGraphDatabase
+from neo4j import GraphDatabase
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.chat_models import ChatOllama
+from langchain_community.embeddings
 
-from prompts import PROMPT_QWEN
+from langchain_community.embeddings.openai import OpenAIEmbeddings
+from langchain_community.chat_models.openai import ChatOpenAI
+os.environ['OPENAI_API_KEY'] = '***'
+
+from prompts import PROMPT_QWEN, PROMPT_OPENAI
 
 app = FastAPI()
+
+use_openai = os.environ.get('OPENAI_API_KEY', None) is not None
 
 
 neo4j_params = {
@@ -32,6 +39,11 @@ embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT,
 chat_model = ChatOllama(base_url='http://ollama-sqlcoder.hyperplane-ollama.svc.cluster.local:11434',
                         model='qwen2.5:7b-instruct-q6_K',
                         num_ctx=8196)
+
+# If you want to use OpenAI Models
+if use_openai:
+  embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
+  chat_model = ChatOpenAI(model='gpt-4o')
 
 def uniform_grab_value(x):
     if hasattr(x, "content"):
@@ -108,6 +120,11 @@ async def get_answer(req: Request, query: str, document: str):
     document=contexts,
     question=query
   )
+  if use_openai:
+    formatted_prompt = PROMPT_OPENAI.format_prompt(
+      document=contexts,
+      question=query
+    )
   
   response = uniform_grab_value(await chat_model.ainvoke(formatted_prompt))
   
