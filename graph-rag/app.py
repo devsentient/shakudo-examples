@@ -9,9 +9,7 @@ from prompts import PROMPT_QWEN, PROMPT_OPENAI
 
 app = FastAPI()
 
-### For OpenAI users, please uncomment these following lines:
-# use_openai = os.environ.get('OPENAI_API_KEY', None) is not None
-# if use_openai:
+### For OpenAI users, please set the value for `OPENAI_API_KEY` environment variable and uncomment these following lines:
 #   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
 #   chat_model = ChatOpenAI(model='gpt-4o')
 
@@ -117,8 +115,7 @@ async def get_answer(req: Request, query: str, document: str):
     question=query
   )
   
-  ### For OpenAI users, please uncomment these following lines to enable 
-  # if use_openai:
+  ### For OpenAI users, please uncomment these following lines to enable OpenAI Prompt
   #   formatted_prompt = PROMPT_OPENAI.format_prompt(
   #     document=contexts,
   #     question=query

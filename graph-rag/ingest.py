@@ -8,10 +8,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_core.documents import Document
 
-### For OpenAI user
-# if os.environ.get('OPENAI_API_KEY', None) is not None:
+### For OpenAI user, please set OPENAI_API_KEY as your environment variable and uncomment the following lines
 #   from langchain_community.embeddings.openai import OpenAIEmbeddings
-#   os.environ['OPENAI_API_KEY'] = '***'
 #   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
 
 neo4j_params = {

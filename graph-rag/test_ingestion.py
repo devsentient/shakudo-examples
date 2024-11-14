@@ -1,6 +1,6 @@
 import os
 from neo4j import GraphDatabase
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.embeddings.ollama import OllamaEmbeddings
 
 OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
 OLLAMA_EMBEDDING_ENDPOINT="http://ollama-cpu.hyperplane-ollama.svc.cluster.local:11434"
