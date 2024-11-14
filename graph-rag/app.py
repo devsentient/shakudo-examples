@@ -4,11 +4,10 @@ from fastapi.responses import JSONResponse
 from neo4j import GraphDatabase
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.chat_models import ChatOllama
-from langchain_community.embeddings
 
 from langchain_community.embeddings.openai import OpenAIEmbeddings
 from langchain_community.chat_models.openai import ChatOpenAI
-os.environ['OPENAI_API_KEY'] = '***'
+
 
 from prompts import PROMPT_QWEN, PROMPT_OPENAI
 
@@ -31,13 +30,13 @@ driver = GraphDatabase.driver(
 
 
 OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
-OLLAMA_EMBEDDING_ENDPOINT="http://ollama-nomic.hyperplane-ollama.svc.cluster.local:11434"
+OLLAMA_EMBEDDING_ENDPOINT="http://ollama-cpu.hyperplane-ollama.svc.cluster.local:11434"
 
 embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
                                    model=OLLAMA_EMBEDDING_MODEL, 
                                    num_ctx=8196)
-chat_model = ChatOllama(base_url='http://ollama-sqlcoder.hyperplane-ollama.svc.cluster.local:11434',
-                        model='qwen2.5:7b-instruct-q6_K',
+chat_model = ChatOllama(base_url='http://ollama.hyperplane-ollama.svc.cluster.local:11434',
+                        model='qwen2.5:14b-instruct-q4_K_M',
                         num_ctx=8196)
 
 # If you want to use OpenAI Models
