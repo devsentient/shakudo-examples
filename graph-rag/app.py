@@ -9,9 +9,7 @@ from prompts import PROMPT_QWEN, PROMPT_OPENAI
 
 app = FastAPI()
 
-### For OpenAI users, please set the value for `OPENAI_API_KEY` environment variable and uncomment these following lines:
-#   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
-#   chat_model = ChatOpenAI(model='gpt-4o')
+
 
 
 neo4j_params = {
@@ -36,6 +34,10 @@ embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT,
 chat_model = ChatOllama(base_url='http://ollama.hyperplane-ollama.svc.cluster.local:11434',
                         model='qwen2.5:14b-instruct-q4_K_M',
                         num_ctx=8196)
+
+### For OpenAI users, please set the value for `OPENAI_API_KEY` environment variable and uncomment these following lines:
+#   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
+#   chat_model = ChatOpenAI(model='gpt-4o')
 
 
 def uniform_grab_value(x):

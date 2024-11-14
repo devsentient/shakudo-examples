@@ -7,10 +7,8 @@ from tqdm import tqdm
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain_core.documents import Document
+from langchain_community.embeddings.openai import OpenAIEmbeddings
 
-### For OpenAI user, please set OPENAI_API_KEY as your environment variable and uncomment the following lines
-#   from langchain_community.embeddings.openai import OpenAIEmbeddings
-#   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
 
 neo4j_params = {
   "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
@@ -36,6 +34,8 @@ OLLAMA_EMBEDDING_ENDPOINT="http://ollama-cpu.hyperplane-ollama.svc.cluster.local
 embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
                                    model=OLLAMA_EMBEDDING_MODEL, 
                                    num_ctx=8196)
+### For OpenAI user, please set OPENAI_API_KEY as your environment variable and uncomment the following lines
+#   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
 
 
 files = glob('***')
