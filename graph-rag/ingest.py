@@ -5,6 +5,14 @@ from glob import glob
 from tqdm import tqdm
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.embeddings.ollama import OllamaEmbeddings
+from langchain_core.documents import Document
+
+### For OpenAI user
+# if os.environ.get('OPENAI_API_KEY', None) is not None:
+#   from langchain_community.embeddings.openai import OpenAIEmbeddings
+#   os.environ['OPENAI_API_KEY'] = '***'
+#   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
 
 neo4j_params = {
   "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
@@ -23,30 +31,14 @@ driver = GraphDatabase.driver(
   auth=(neo4j_params['user'], neo4j_params['password'])
 )
 
-try: 
-    graph.query("RETURN 1;")
-    print("Connection to neo4j is successful.")
-except Exception as e:
-    print("Connection to neo4j is unsuccessful. Please check your configurations. Trace: \n")
-    raise Exception(str(e))
-  
-from langchain_community.embeddings.ollama import OllamaEmbeddings
 
 OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
-OLLAMA_EMBEDDING_ENDPOINT="http://ollama-nomic.hyperplane-ollama.svc.cluster.local:11434"
+OLLAMA_EMBEDDING_ENDPOINT="http://ollama-cpu.hyperplane-ollama.svc.cluster.local:11434"
 
 embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
                                    model=OLLAMA_EMBEDDING_MODEL, 
                                    num_ctx=8196)
 
-### For OpenAI user
-if os.environ.get('OPENAI_API_KEY', None) is not None:
-  from langchain_community.embeddings.openai import OpenAIEmbeddings
-  os.environ['OPENAI_API_KEY'] = '***'
-
-  embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
-
-  from langchain_core.documents import Document
 
 files = glob('***')
 p_text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100)

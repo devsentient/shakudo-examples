@@ -1,19 +1,19 @@
-from fastapi import FastAPI, Request
 import os, re
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request
 from neo4j import GraphDatabase
-from langchain_community.embeddings import OllamaEmbeddings
-from langchain_community.chat_models import ChatOllama
-
+from langchain_community.embeddings.ollama import OllamaEmbeddings
+from langchain_community.chat_models.ollama import ChatOllama
 from langchain_community.embeddings.openai import OpenAIEmbeddings
 from langchain_community.chat_models.openai import ChatOpenAI
-
-
 from prompts import PROMPT_QWEN, PROMPT_OPENAI
 
 app = FastAPI()
 
-use_openai = os.environ.get('OPENAI_API_KEY', None) is not None
+### For OpenAI users, please uncomment these following lines:
+# use_openai = os.environ.get('OPENAI_API_KEY', None) is not None
+# if use_openai:
+#   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
+#   chat_model = ChatOpenAI(model='gpt-4o')
 
 
 neo4j_params = {
@@ -39,10 +39,6 @@ chat_model = ChatOllama(base_url='http://ollama.hyperplane-ollama.svc.cluster.lo
                         model='qwen2.5:14b-instruct-q4_K_M',
                         num_ctx=8196)
 
-# If you want to use OpenAI Models
-if use_openai:
-  embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
-  chat_model = ChatOpenAI(model='gpt-4o')
 
 def uniform_grab_value(x):
     if hasattr(x, "content"):
@@ -50,6 +46,7 @@ def uniform_grab_value(x):
     else:
         value = x
     return value
+
 
 neo4j_query = """
   CALL {
@@ -119,16 +116,16 @@ async def get_answer(req: Request, query: str, document: str):
     document=contexts,
     question=query
   )
-  if use_openai:
-    formatted_prompt = PROMPT_OPENAI.format_prompt(
-      document=contexts,
-      question=query
-    )
+  
+  ### For OpenAI users, please uncomment these following lines to enable 
+  # if use_openai:
+  #   formatted_prompt = PROMPT_OPENAI.format_prompt(
+  #     document=contexts,
+  #     question=query
+  #   )
   
   response = uniform_grab_value(await chat_model.ainvoke(formatted_prompt))
   
   return {
     'response': response
   }
-
-  
