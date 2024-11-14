@@ -1,44 +1,9 @@
 import os, re
 from fastapi import FastAPI, Request
-from neo4j import GraphDatabase
-from langchain_community.embeddings.ollama import OllamaEmbeddings
-from langchain_community.chat_models.ollama import ChatOllama
-from langchain_community.embeddings.openai import OpenAIEmbeddings
-from langchain_community.chat_models.openai import ChatOpenAI
 from prompts import PROMPT_QWEN, PROMPT_OPENAI
+from common import driver, embedding_model, chat_model
 
 app = FastAPI()
-
-
-
-
-neo4j_params = {
-  "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
-  "user": os.environ.get('NEO4J_USER', "neo4j"),
-  "password": os.environ.get('NEO4J_PASSWORD', "Shakudo312!")
-}
-
-
-driver = GraphDatabase.driver(
-    f"{neo4j_params['URL']}",
-    auth=(neo4j_params['user'], neo4j_params['password'])
-)
-
-
-OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
-OLLAMA_EMBEDDING_ENDPOINT="http://ollama-cpu.hyperplane-ollama.svc.cluster.local:11434"
-
-embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
-                                   model=OLLAMA_EMBEDDING_MODEL, 
-                                   num_ctx=8196)
-chat_model = ChatOllama(base_url='http://ollama.hyperplane-ollama.svc.cluster.local:11434',
-                        model='qwen2.5:14b-instruct-q4_K_M',
-                        num_ctx=8196)
-
-### For OpenAI users, please set the value for `OPENAI_API_KEY` environment variable and uncomment these following lines:
-#   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
-#   chat_model = ChatOpenAI(model='gpt-4o')
-
 
 def uniform_grab_value(x):
     if hasattr(x, "content"):
