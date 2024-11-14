@@ -10,6 +10,9 @@ from langchain_community.chat_models.openai import ChatOpenAI
 OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
 OLLAMA_EMBEDDING_ENDPOINT="http://ollama-cpu.hyperplane-ollama.svc.cluster.local:11434"
 
+#=========================|
+#  Configure Neo4j        |
+#=========================|
 
 neo4j_params = {
   "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
@@ -29,12 +32,21 @@ graph = Neo4jGraph(
   password=neo4j_params['password']
 )
 
+#=========================|
+#  Configure Ollama       |
+#=========================|
+
 embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
                                    model=OLLAMA_EMBEDDING_MODEL, 
                                    num_ctx=8196)
 chat_model = ChatOllama(base_url='http://ollama.hyperplane-ollama.svc.cluster.local:11434',
                         model='qwen2.5:14b-instruct-q4_K_M',
                         num_ctx=8196)
+
+
+#=========================|
+#  Configure OpenAI       |
+#=========================|
 
 ### For OpenAI user, please set OPENAI_API_KEY as your environment variable and uncomment the following lines
 #   embedding_model = OpenAIEmbeddings(model='text-embedding-ada-002')
