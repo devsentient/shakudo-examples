@@ -1,37 +1,9 @@
-from fastapi import FastAPI, Request
 import os, re
-from fastapi.responses import JSONResponse
-from neo4j import GraphDatabase, AsyncGraphDatabase
-from langchain_community.embeddings import OllamaEmbeddings
-from langchain_community.chat_models import ChatOllama
-
-from prompts import PROMPT_QWEN
+from fastapi import FastAPI, Request
+from prompts import PROMPT_QWEN, PROMPT_OPENAI
+from common import driver, embedding_model, chat_model
 
 app = FastAPI()
-
-
-neo4j_params = {
-  "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
-  "user": os.environ.get('NEO4J_USER', "neo4j"),
-  "password": os.environ.get('NEO4J_PASSWORD', "Shakudo312!")
-}
-
-
-driver = GraphDatabase.driver(
-    f"{neo4j_params['URL']}",
-    auth=(neo4j_params['user'], neo4j_params['password'])
-)
-
-
-OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
-OLLAMA_EMBEDDING_ENDPOINT="http://ollama-nomic.hyperplane-ollama.svc.cluster.local:11434"
-
-embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
-                                   model=OLLAMA_EMBEDDING_MODEL, 
-                                   num_ctx=8196)
-chat_model = ChatOllama(base_url='http://ollama-sqlcoder.hyperplane-ollama.svc.cluster.local:11434',
-                        model='qwen2.5:7b-instruct-q6_K',
-                        num_ctx=8196)
 
 def uniform_grab_value(x):
     if hasattr(x, "content"):
@@ -39,6 +11,7 @@ def uniform_grab_value(x):
     else:
         value = x
     return value
+
 
 neo4j_query = """
   CALL {
@@ -109,10 +82,14 @@ async def get_answer(req: Request, query: str, document: str):
     question=query
   )
   
+  ### For OpenAI users, please uncomment these following lines to enable OpenAI Prompt
+  #   formatted_prompt = PROMPT_OPENAI.format_prompt(
+  #     document=contexts,
+  #     question=query
+  #   )
+  
   response = uniform_grab_value(await chat_model.ainvoke(formatted_prompt))
   
   return {
     'response': response
   }
-
-  

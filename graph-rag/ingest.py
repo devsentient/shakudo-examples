@@ -1,45 +1,9 @@
-import os
-from langchain_community.graphs import Neo4jGraph
-from neo4j import GraphDatabase
 from glob import glob
 from tqdm import tqdm
-
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-neo4j_params = {
-  "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
-  "user": os.environ.get('NEO4J_USER', "neo4j"),
-  "password": os.environ.get('NEO4J_PASSWORD', "Shakudo312!")
-}
-
-graph = Neo4jGraph(
-  url=neo4j_params['URL'],
-  username=neo4j_params['user'],
-  password=neo4j_params['password']
-)
-
-driver = GraphDatabase.driver(
-  f"{neo4j_params['URL']}",
-  auth=(neo4j_params['user'], neo4j_params['password'])
-)
-
-try: 
-    graph.query("RETURN 1;")
-    print("Connection to neo4j is successful.")
-except Exception as e:
-    print("Connection to neo4j is unsuccessful. Please check your configurations. Trace: \n")
-    raise Exception(str(e))
-  
-from langchain_community.embeddings import OllamaEmbeddings
-
-OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
-OLLAMA_EMBEDDING_ENDPOINT="http://ollama-nomic.hyperplane-ollama.svc.cluster.local:11434"
-
-embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
-                                   model=OLLAMA_EMBEDDING_MODEL, 
-                                   num_ctx=8196)
-
 from langchain_core.documents import Document
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from common import graph, embedding_model
+
 
 files = glob('***')
 p_text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100)

@@ -1,23 +1,5 @@
-import os
-from neo4j import GraphDatabase
-from langchain_community.embeddings import OllamaEmbeddings
 
-OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
-OLLAMA_EMBEDDING_ENDPOINT="http://ollama-nomic.hyperplane-ollama.svc.cluster.local:11434"
-
-embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
-                                   model=OLLAMA_EMBEDDING_MODEL, num_ctx=8196)
-
-neo4j_params = {
-  "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
-  "user": os.environ.get('NEO4J_USER', "neo4j"),
-  "password": os.environ.get('NEO4J_PASSWORD', "Shakudo312!")
-}
-
-driver = GraphDatabase.driver(
-    f"{neo4j_params['URL']}",
-    auth=(neo4j_params['user'], neo4j_params['password'])
-)
+from common import embedding_model, driver
 
 neo4j_query = """
   CALL {
