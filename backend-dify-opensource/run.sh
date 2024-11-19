@@ -1,4 +1,4 @@
-cd nlp-sql-chat/app/backend-dify-opensource
+cd backend-dify-opensource/
 
 apt-get update -y && apt-get upgrade -y
 apt-get install -y dnsutils postgresql
