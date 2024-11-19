@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 from connections.base import DatabaseConnection
 from google.cloud import bigquery
 

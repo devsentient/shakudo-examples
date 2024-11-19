@@ -82,5 +82,6 @@ Your response should be exactly in the JSON format below, nothing else.
 <|start_header_id|>assistant<|end_header_id|>
 """
 
-COLUMN_FILTER_PROMPT = PromptTemplate(template=COLUMN_FILTER_TEMPLATE, 
-                                      input_variables=['columns', 'prompt'])
+COLUMN_FILTER_PROMPT = PromptTemplate(
+    template=COLUMN_FILTER_TEMPLATE, input_variables=["columns", "prompt"]
+)
