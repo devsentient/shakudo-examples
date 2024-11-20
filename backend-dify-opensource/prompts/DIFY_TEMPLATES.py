@@ -27,7 +27,7 @@ Adding "{schema}." to any table in the query.
 The format of the response in the following format: 
 {{"data": 'SQL query to run'}}
 Please note that the query to extract date part is 'EXTRACT(part FROM date_expression)'
-Example is {{"data" : "SELECT * from project_id.loblaw.table1"}}
+Example is {{"data" : "SELECT * from example_schema.example_db.table1"}}
 """
 
 ANS_TEMPLATE = """

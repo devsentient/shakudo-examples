@@ -11,7 +11,6 @@ logging.basicConfig(level=logging.INFO)
 import json
 
 from prompts.DIFY_TEMPLATES import TEMPLATE_TABLE_FINDING, TEMPLATE
-# from prompts.DIFY import TEMPLATE, TEMPLATE_TABLE_FINDING
 from utils.common import exec_sql, get_codeqwen, get_db, uniform_grab_value
 
 
@@ -106,9 +105,10 @@ async def gen_sql(prompt: str, schema: str, tables: list[str]):
 async def validate_and_exec_sql(sqlCode: str) -> str:
     language = "postgresql"
     validated = await get_db(language).validate_query(sqlCode)
-    validated = validated["message"]
+    print("Validated: ", validated)
+    validatedMsg = validated["message"]
 
-    if validated == "":
+    if validatedMsg != "":
         logging.warning("INVALID SQL CODE: " + sqlCode)
         sqlCode = ""
     if sqlCode == "":
@@ -124,9 +124,16 @@ async def validate_and_exec_sql(sqlCode: str) -> str:
 async def recommend_tables_endpoint(prompt: str, schema: str):
     return await recommend_tables(prompt, schema)
 
-@app.get("/generateSQL")
-async def generate_sql_endpoint(prompt: str, schema: str, tables: str):
-    return await gen_sql(prompt, schema, tables)
+from pydantic import BaseModel
+
+class SQLRequest(BaseModel):
+    prompt: str
+    schema: str
+    tables: list[str]
+
+@app.post("/generateSQL")
+async def generate_sql_endpoint(data: SQLRequest):
+    return await gen_sql(data.prompt, data.schema, data.tables)
 
 @app.get("/validateAndExecuteSQL")
 async def validate_and_exec_sql_endpoint(sqlCode: str):
