@@ -24,10 +24,10 @@ Given information about the table:
 Give me sql query that can answer: "{prompt}"
 
 Adding "{schema}." to any table in the query.
-The format of the response in the following format: 
-{{"data": 'SQL query to run'}}
+The format of the response in the following string format only. Strictly return the SQL query as string: 'SQL query to run'
+
 Please note that the query to extract date part is 'EXTRACT(part FROM date_expression)'
-Example is {{"data" : "SELECT * from example_schema.example_table.table1"}}
+Example of return is "SELECT * from example_schema.example_table.table1"
 """
 
 ANS_TEMPLATE = """
