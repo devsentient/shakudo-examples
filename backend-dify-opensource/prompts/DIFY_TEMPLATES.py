@@ -12,7 +12,7 @@ Given the list of table names and their column names in the format {{table1: [co
 Give me the relevant tables to this prompt: "{prompt}"
 
 Your return should be exactly in format below, nothing else:
-{{[table1, table2, ...]}}
+{{"data": [table1, table2, ...]}}
 """
 
 TEMPLATE = """
@@ -25,9 +25,9 @@ Give me sql query that can answer: "{prompt}"
 
 Adding "{schema}." to any table in the query.
 The format of the response in the following format: 
-{{'SQL query to run'}}
+{{"data": 'SQL query to run'}}
 Please note that the query to extract date part is 'EXTRACT(part FROM date_expression)'
-Example is {{"SELECT * from example_schema.example_db.table1"}}
+Example is {{"data" : "SELECT * from example_schema.example_table.table1"}}
 """
 
 ANS_TEMPLATE = """

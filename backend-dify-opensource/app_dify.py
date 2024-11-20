@@ -129,15 +129,26 @@ from pydantic import BaseModel
 class SQLRequest(BaseModel):
     prompt: str
     schema: str
-    tables: list[str]
+    tables: str
 
 @app.post("/generateSQL")
 async def generate_sql_endpoint(data: SQLRequest):
-    return await gen_sql(data.prompt, data.schema, data.tables)
+    try:
+        tablesArray = json.loads(data.tables)["data"]
+        return await gen_sql(data.prompt, data.schema, tablesArray)
+    except json.JSONDecodeError as e:
+        print(f"JSON decoding failed for tablesArray: {e}")
+        return "Couldn't get sql query for this prompt."
+    
 
 @app.get("/validateAndExecuteSQL")
 async def validate_and_exec_sql_endpoint(sqlCode: str):
-    return await validate_and_exec_sql(sqlCode)
+    try:
+        sqlCode = json.loads(sqlCode)["data"]
+        return await validate_and_exec_sql(sqlCode)
+    except json.JSONDecodeError as e:
+        print(f"JSON decoding failed for sqlCode: {e}")
+        return "Unable to validate and execute SQL command."
 
 @app.get("/ff_sql")
 async def fullflow(prompt: str, schema: str):
