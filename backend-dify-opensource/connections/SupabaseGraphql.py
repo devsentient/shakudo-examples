@@ -18,6 +18,7 @@ Returns:
     _type_: _description_
 """
 import requests
+
 from connections.base import DatabaseConnection
 
 SUPABASE_KEY = os.environ.get('YOUR_SUPABASE_KEY', None)

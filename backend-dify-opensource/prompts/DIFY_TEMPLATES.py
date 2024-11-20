@@ -1,4 +1,7 @@
-"""This module is to define prompt templates for dify application."""
+"""
+This module is to define USER prompt templates for dify application.
+The system prompts are set in the workflow.
+"""
 
 TEMPLATE_TABLE_FINDING = """
 Given the list of table names and their column names in the format {{table1: [column1, column2, ...], table2: [column1, column2, ...]}}:

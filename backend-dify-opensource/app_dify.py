@@ -9,8 +9,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 logging.basicConfig(level=logging.INFO)
 import json
+
 from pydantic import BaseModel
-from prompts.DIFY_TEMPLATES import TEMPLATE_TABLE_FINDING, TEMPLATE
+
+from prompts.DIFY_TEMPLATES import TEMPLATE, TEMPLATE_TABLE_FINDING
 from utils.common import exec_sql, get_codeqwen, get_db, uniform_grab_value
 
 LANGUAGE = "postgresql"
@@ -92,30 +94,37 @@ async def validate_and_exec_sql(sqlCode: str) -> str:
 
 @app.get("/recommendTables")
 async def recommend_tables_endpoint(prompt: str, schema: str):
+    """
+    Endpoint to recommend tables based on user's prompt and schema.
+    """
     return await recommend_tables(prompt, schema)
 
 
 class SQLRequest(BaseModel):
     prompt: str
     schema: str
-    tables: dict
+    tables: str
 
 
 @app.post("/generateSQL")
 async def generate_sql_endpoint(data: SQLRequest):
+    """
+    Endpoint to generate SQL query based on user's prompt and schema.
+    """
     try:
-        tablesArray = data.tables["data"]
+        tablesArray = json.loads(data.tables)["data"]
         return await gen_sql(data.prompt, data.schema, tablesArray)
-    except json.JSONDecodeError as e:
-        print(f"JSON decoding failed for tablesArray: {e}")
+    except:
+        print(f"Could not get 'data' field in tables field in payload.")
         return "Couldn't get sql query for this prompt."
 
 
 @app.post("/validateAndExecuteSQL")
 async def validate_and_exec_sql_endpoint(sqlCode: dict):
-    print(sqlCode)
+    """
+    Endpoint to validate and execute SQL query.
+    """
     sqlCode = sqlCode["data"]
-    print(sqlCode)
     return await validate_and_exec_sql(sqlCode)
 
 

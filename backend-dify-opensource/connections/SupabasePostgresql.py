@@ -2,11 +2,12 @@ import json
 import os
 
 import psycopg as pg
-from connections.base import DatabaseConnection
-from connections.sql_query_templates import get_sql_templates
 from psycopg2 import (DatabaseError, DataError, OperationalError,
                       ProgrammingError)
 from psycopg.rows import dict_row
+
+from connections.base import DatabaseConnection
+from connections.sql_query_templates import get_sql_templates
 
 default_postgres = "nlp-sql-postgresql.hyperplane-nlp-sql-v0"
 dbname = os.environ.get("POSTGRES_DB_NAME", "postgres")

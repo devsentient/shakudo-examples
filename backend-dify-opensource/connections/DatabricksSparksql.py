@@ -2,10 +2,11 @@ import json
 import os
 import traceback as tb
 
-from connections.base import DatabaseConnection
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import (DatabaseError, DataError, OperationalError,
                             ProgrammingError)
+
+from connections.base import DatabaseConnection
 
 hostname = os.environ.get(
     "DATABRICKS_HOSTNAME", "adb-8210930792410875.15.azuredatabricks.net"
