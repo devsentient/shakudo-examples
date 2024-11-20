@@ -35,12 +35,12 @@ import requests
 url = "http://0.0.0.0:8000/validateAndExecuteSQL"
 
 # Define the SQL code to validate and execute
-params = {
-    "sqlCode": "SELECT COUNT(*) FROM climate.climate_change_data_metadata;"
+data = {
+    "data": "SELECT COUNT(*) FROM climate.climate_change_data_metadata;"
 }
 
 # Send a GET request with the SQL code as a query parameter
-response = requests.get(url, params=params)
+response = requests.post(url, json=data) 
 
 # Print the response from the server
 print(response.json())

@@ -9,9 +9,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 logging.basicConfig(level=logging.INFO)
 import json
-
+from pydantic import BaseModel
 from prompts.DIFY_TEMPLATES import TEMPLATE_TABLE_FINDING, TEMPLATE
 from utils.common import exec_sql, get_codeqwen, get_db, uniform_grab_value
+
+LANGUAGE = "postgresql"
 
 
 @asynccontextmanager
@@ -47,26 +49,19 @@ async def recommend_tables(userprompt, schema):
     Recommend tables based on user's prompt and schema.
     It generates the prompt dynamically and return it.
     """
-    language = "postgresql"
-    # llm = get_codeqwen()
-    parsed = await get_db(language).get_tables(schema)
+    parsed = await get_db(LANGUAGE).get_tables(schema)
 
     prompt_table = TEMPLATE_TABLE_FINDING.format(
         table_example=str(parsed), prompt=userprompt
     )
-    # tables = uniform_grab_value(await llm.ainvoke(prompt_table))
-    # tables = json.loads(tables)["data"]
-
-    # tables = [t for t in tables if t in parsed]
     return prompt_table
 
 
 async def gen_sql(prompt: str, schema: str, tables: list[str]):
-    language = "postgresql"
-    # llm = get_codeqwen()
-
-    table_spec, _ = await get_db(language).get_table_specs(tables, schema)
-
+    """
+    Generates template for LLM to generate SQL query.
+    """
+    table_spec, _ = await get_db(LANGUAGE).get_table_specs(tables, schema)
     info = "\n".join(
         [f"Table name: {n}\nColumns:\n{d}\n" for n, d in table_spec.items()]
     )
@@ -74,44 +69,24 @@ async def gen_sql(prompt: str, schema: str, tables: list[str]):
         prompt=prompt,
         table_info=info,
         schema=schema,
-        language=language,
+        LANGUAGE=LANGUAGE,
     )
     return prompt_built
-        # query = uniform_grab_value(await llm.ainvoke(prompt_built))
-        # sqlCode = json.loads(query)["data"]
 
-    #     validated = await get_db(language).validate_query(sqlCode)
-    #     validated = validated["message"]
-
-    #     if validated == "":
-    #         break
-    #     num_try -= 1
-
-    #     errMessage = validated
-    #     sqlCode = ""
-    # if sqlCode == "":
-    #     return "Couldn't get sql query for this prompt"
-    # table = await exec_sql(language, sqlCode)
-
-    # message = {"sql": f"```sql\n{sqlCode}```", "table": table}
-
-    # return message
 
 async def validate_and_exec_sql(sqlCode: str) -> str:
-    language = "postgresql"
-    validated = await get_db(language).validate_query(sqlCode)
-    print("Validated: ", validated)
+    """
+    Validates and executes SQL query.
+    """
+    validated = await get_db(LANGUAGE).validate_query(sqlCode)
     validatedMsg = validated["message"]
 
     if validatedMsg != "":
         logging.warning("INVALID SQL CODE: " + sqlCode)
-        sqlCode = ""
-    if sqlCode == "":
         return "Couldn't get sql query for this prompt"
-    table = await exec_sql(language, sqlCode)
 
+    table = await exec_sql(LANGUAGE, sqlCode)
     message = {"sql": f"```sql\n{sqlCode}```", "table": table}
-
     return message
 
 
@@ -119,12 +94,12 @@ async def validate_and_exec_sql(sqlCode: str) -> str:
 async def recommend_tables_endpoint(prompt: str, schema: str):
     return await recommend_tables(prompt, schema)
 
-from pydantic import BaseModel
 
 class SQLRequest(BaseModel):
     prompt: str
     schema: str
     tables: dict
+
 
 @app.post("/generateSQL")
 async def generate_sql_endpoint(data: SQLRequest):
@@ -134,19 +109,14 @@ async def generate_sql_endpoint(data: SQLRequest):
     except json.JSONDecodeError as e:
         print(f"JSON decoding failed for tablesArray: {e}")
         return "Couldn't get sql query for this prompt."
-    
 
-@app.get("/validateAndExecuteSQL")
-async def validate_and_exec_sql_endpoint(sqlCode: str):
-    sqlCode = sqlCode.strip('"').strip("'")
+
+@app.post("/validateAndExecuteSQL")
+async def validate_and_exec_sql_endpoint(sqlCode: dict):
+    print(sqlCode)
+    sqlCode = sqlCode["data"]
     print(sqlCode)
     return await validate_and_exec_sql(sqlCode)
-
-@app.get("/ff_sql")
-async def fullflow(prompt: str, schema: str):
-    tables = await recommend_tables(prompt, schema)
-    resp = await gen_sql(prompt=prompt, schema=schema, tables=tables)
-    return resp
 
 
 @app.get("/")
