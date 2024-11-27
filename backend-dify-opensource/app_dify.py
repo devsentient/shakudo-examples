@@ -103,7 +103,7 @@ async def recommend_tables_endpoint(prompt: str, schema: str):
 class SQLRequest(BaseModel):
     prompt: str
     schema: str
-    tables: str
+    tables: dict
 
 
 @app.post("/generateSQL")
@@ -112,7 +112,8 @@ async def generate_sql_endpoint(data: SQLRequest):
     Endpoint to generate SQL query based on user's prompt and schema.
     """
     try:
-        tablesArray = json.loads(data.tables)["data"]
+        tablesString = data.tables["data"]
+        tablesArray = tablesString.split(",")
         return await gen_sql(data.prompt, data.schema, tablesArray)
     except:
         print(f"Could not get 'data' field in tables field in payload.")

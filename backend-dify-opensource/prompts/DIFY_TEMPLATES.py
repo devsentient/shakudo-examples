@@ -11,7 +11,9 @@ Given the list of table names and their column names in the format {{table1: [co
 Give me the relevant tables to this prompt: "{prompt}"
 
 Your return should be exactly in format below, nothing else:
-{{"data": [table1, table2, ...]}}
+{{"data": "table_1, table_2, table_3"}}
+
+
 """
 
 TEMPLATE = """
