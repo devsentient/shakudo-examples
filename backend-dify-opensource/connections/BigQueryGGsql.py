@@ -1,7 +1,9 @@
-import os
 import json
-from connections.base import DatabaseConnection
+import os
+
 from google.cloud import bigquery
+
+from connections.base import DatabaseConnection
 
 MAX_DB_RET = 60
 

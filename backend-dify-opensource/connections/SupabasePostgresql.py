@@ -1,8 +1,11 @@
-from psycopg2 import OperationalError, ProgrammingError, DataError, DatabaseError
-import os
 import json
+import os
+
 import psycopg as pg
+from psycopg2 import (DatabaseError, DataError, OperationalError,
+                      ProgrammingError)
 from psycopg.rows import dict_row
+
 from connections.base import DatabaseConnection
 from connections.sql_query_templates import get_sql_templates
 

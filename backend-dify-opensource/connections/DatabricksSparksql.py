@@ -1,13 +1,11 @@
-from sqlalchemy.exc import (
-    OperationalError,
-    ProgrammingError,
-    DataError,
-    DatabaseError,
-)
-import os
 import json
+import os
 import traceback as tb
-from sqlalchemy import text, create_engine
+
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import (DatabaseError, DataError, OperationalError,
+                            ProgrammingError)
+
 from connections.base import DatabaseConnection
 
 hostname = os.environ.get(

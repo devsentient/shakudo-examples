@@ -44,8 +44,7 @@ Example is {{"data" : "SELECT * from project_id.loblaw.table1"}}
 """
 
 CUSTOM_PROMPT = PromptTemplate(
-    input_variables=["prompt", "additional_err", "table_info",
-                     "schema", "language"],
+    input_variables=["prompt", "additional_err", "table_info", "schema", "language"],
     template=TEMPLATE,
 )
 
@@ -101,5 +100,6 @@ Your response should be exactly in JSON format below, status can only be 'ok' or
 <|im_start|> assistant
 """
 
-COLUMN_FILTER_PROMPT = PromptTemplate(template=COLUMN_FILTER_TEMPLATE, 
-                                      input_variables=['columns', 'prompt'])
+COLUMN_FILTER_PROMPT = PromptTemplate(
+    template=COLUMN_FILTER_TEMPLATE, input_variables=["columns", "prompt"]
+)

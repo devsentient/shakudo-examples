@@ -1,0 +1,614 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: helloSQL
+  use_icon_as_answer_icon: false
+kind: app
+version: 0.1.2
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: http-request
+        targetType: llm
+      id: 1732052927085-source-llm-target
+      source: '1732052927085'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: http-request
+        targetType: llm
+      id: 1732114740586-source-1732114905941-target
+      source: '1732114740586'
+      sourceHandle: source
+      target: '1732114905941'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: http-request
+      id: llm-source-1732114740586-target
+      source: llm
+      sourceHandle: source
+      target: '1732114740586'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: http-request
+      id: 1732114905941-source-1732120903055-target
+      selected: false
+      source: '1732114905941'
+      sourceHandle: source
+      target: '1732120903055'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: http-request
+        targetType: llm
+      id: 1732120903055-source-1732133949728-target
+      source: '1732120903055'
+      sourceHandle: source
+      target: '1732133949728'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 1732133949728-source-answer-target
+      source: '1732133949728'
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: question-classifier
+        targetType: http-request
+      id: 1732134622261-1-1732052927085-target
+      source: '1732134622261'
+      sourceHandle: '1'
+      target: '1732052927085'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: question-classifier
+        targetType: llm
+      id: 1732134622261-2-1732134719070-target
+      source: '1732134622261'
+      sourceHandle: '2'
+      target: '1732134719070'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 1732134719070-source-1732134793547-target
+      source: '1732134719070'
+      sourceHandle: source
+      target: '1732134793547'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: code
+      id: 1732052853264-source-1732724969420-target
+      source: '1732052853264'
+      sourceHandle: source
+      target: '1732724969420'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: question-classifier
+      id: 1732724969420-source-1732134622261-target
+      source: '1732724969420'
+      sourceHandle: source
+      target: '1732134622261'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: Start
+        type: start
+        variables:
+        - label: schema
+          max_length: 48
+          options: []
+          required: true
+          type: text-input
+          variable: schema
+        - label: dify_api_tool
+          max_length: 50
+          options: []
+          required: false
+          type: text-input
+          variable: dify_api_tool
+      height: 116
+      id: '1732052853264'
+      position:
+        x: -593.6983372752245
+        y: -349.470905974131
+      positionAbsolute:
+        x: -593.6983372752245
+        y: -349.470905974131
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: LLM Node to get the most related tables to the user query.
+        memory:
+          query_prompt_template: "{{#1732052927085.body#}}\n\n---\n\nIMPORTANT GUIDELINES:\
+            \ \n\n- Always output as dictionary like mentioned below:\n{\"data\":\
+            \ \"table_1, table_2, table_3\"}\n- DO NOT add any extra strings or markdown\
+            \ code along with it. \n- DO NOT output in any other format. \n- DO NOT\
+            \ make up facts or modify data.\n- Ignore {{#sys.query#}}"
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 10
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        prompt_template:
+        - id: ea697842-5436-4646-85d4-fc948fa29d82
+          role: system
+          text: "I will give you tables and their column names, return table names\
+            \ which are the most related to the prompt provided by the user.\nIf nothing\
+            \ is directly related, randomly pick some.\n\nIMPORTANT GUIDELINES: \n\
+            - Always output as dictionary like mentioned below:\n{\"data\": \"table_1,\
+            \ table_2, table_3\"}\n- DO NOT add any extra strings or markdown code\
+            \ along with it. \n"
+        selected: false
+        title: TableRecommender
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 142
+      id: llm
+      position:
+        x: 838.3879632499954
+        y: -445.31675362234716
+      positionAbsolute:
+        x: 838.3879632499954
+        y: -445.31675362234716
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1732133949728.text#}}'
+        desc: ''
+        selected: false
+        title: NLPSQL-Output
+        type: answer
+        variables: []
+      height: 103
+      id: answer
+      position:
+        x: 2433.2818039474496
+        y: -445.31675362234716
+      positionAbsolute:
+        x: 2433.2818039474496
+        y: -445.31675362234716
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        desc: API to fetch the PROMPT to get relevant tables related to the query.
+        headers: ''
+        method: get
+        params: 'schema:{{#1732052853264.schema#}}
+
+          prompt:{{#sys.query#}}'
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: /recommendTables
+        type: http-request
+        url: '{{#1732724969420.dify_api_tool#}}/recommendTables'
+        variables: []
+      height: 157
+      id: '1732052927085'
+      position:
+        x: 514.9185587108886
+        y: -445.31675362234716
+      positionAbsolute:
+        x: 514.9185587108886
+        y: -445.31675362234716
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-110
+            key: ''
+            type: text
+            value: '{
+
+              "prompt": "{{#sys.query#}}",
+
+              "schema": "{{#1732052853264.schema#}}",
+
+              "tables": {{#llm.text#}}
+
+              }'
+          type: json
+        desc: API to fetch the prompt for generating SQL.
+        headers: ''
+        method: post
+        params: ''
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: /generateSQL
+        type: http-request
+        url: '{{#1732724969420.dify_api_tool#}}/generateSQL'
+        variables: []
+      height: 157
+      id: '1732114740586'
+      position:
+        x: 1163.733161252996
+        y: -445.31675362234716
+      positionAbsolute:
+        x: 1163.733161252996
+        y: -445.31675362234716
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: LLM Node to generate the SQL command using the prompt from previous
+          step.
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        prompt_template:
+        - edition_type: basic
+          id: 32bf8e28-2b70-4c91-b4df-ea11b4219987
+          role: system
+          text: "You are an expert in postgresql, create a syntactically correct postgresql\
+            \ query to run\nbased on user questions.\n\nIMPORTANT GUIDELINES: \n-\
+            \ Always output as dictionary like this \n{\"data\": \"SQL query to run\"\
+            }\n- DO NOT add any extra strings or markdown code along with it. "
+        - id: 0a2e8c94-7a45-4760-b881-255a31d399ef
+          role: user
+          text: "{{#1732114740586.body#}}\n\nIMPORTANT GUIDELINES: \n- Always output\
+            \ as dictionary like this \n{\"data\": \"SQL query to run\"}\n- DO NOT\
+            \ add any extra strings or markdown code along with it. \n- DO NOT output\
+            \ in any other format. \n- DO NOT make up facts or modify data."
+        selected: false
+        title: getSQLCommand
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 158
+      id: '1732114905941'
+      position:
+        x: 1480.478231821482
+        y: -445.31675362234716
+      positionAbsolute:
+        x: 1480.478231821482
+        y: -445.31675362234716
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - id: key-value-370
+            key: ''
+            type: text
+            value: '{{#1732114905941.text#}}'
+          type: json
+        desc: API to execute the SQL command.
+        headers: ''
+        method: post
+        params: ''
+        selected: false
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: /executeSQL
+        type: http-request
+        url: '{{#1732724969420.dify_api_tool#}}/validateAndExecuteSQL'
+        variables: []
+      height: 141
+      id: '1732120903055'
+      position:
+        x: 1824.3042024209135
+        y: -445.31675362234716
+      positionAbsolute:
+        x: 1824.3042024209135
+        y: -445.31675362234716
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: LLM Node to prettify the output.
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        prompt_template:
+        - id: 21d1034d-9db9-43c1-9fff-978d55c12553
+          role: system
+          text: You are an assistant that specializes in parsing and formatting structured
+            outputs. Your task is to extract information from raw outputs, prettify
+            it, and present the SQL command and any data tables separately. Ensure
+            the SQL commands are presented in clean, readable syntax, and tables are
+            properly formatted for display.
+        - id: 9d84d7a1-620e-4c53-a334-800f23ed8904
+          role: user
+          text: "I have a raw JSON output. It contains an SQL command and a table\
+            \ in a single string. Please extract and prettify both the SQL query and\
+            \ the table separately. Present them clearly with appropriate SQL Code\
+            \ block and Formatted Table. The table should be displayed as a clean\
+            \ Markdown table.\n\nRaw json: \n{{#1732120903055.body#}}\n\nSTRICT GUIDELINES:\
+            \ \n- ONLY Output the SQL command and the executed output such as tables\
+            \ or a row.\n- Do not add your own facts or data. "
+        selected: false
+        title: prettyOutput
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 126
+      id: '1732133949728'
+      position:
+        x: 2129.4863911562384
+        y: -445.31675362234716
+      positionAbsolute:
+        x: 2129.4863911562384
+        y: -445.31675362234716
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        classes:
+        - id: '1'
+          name: SQL or data related user query
+        - id: '2'
+          name: General greetings or normal chat
+        desc: Classifies if message is general or NLPSQL related user question.
+        instructions: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        query_variable_selector:
+        - '1732052853264'
+        - sys.query
+        selected: false
+        title: Question Classifier
+        topics: []
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 220
+      id: '1732134622261'
+      position:
+        x: 137.3195573354551
+        y: -349.470905974131
+      positionAbsolute:
+        x: 137.3195573354551
+        y: -349.470905974131
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: LLM Node to return friendly chatbot like responses.
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: openai
+        prompt_template:
+        - id: d1c32ac5-24a8-4583-b3d1-8ab15a7c2c43
+          role: system
+          text: You are friendly chatbot who drives conversation with user about NLPSQL.
+            If user asks random general questions then request user to chat about
+            the SQL usecases.
+        - id: 085ccbf2-8ff5-417f-8da5-eecac29b87a1
+          role: user
+          text: '{{#sys.query#}}'
+        selected: false
+        title: friendlyOutput
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 142
+      id: '1732134719070'
+      position:
+        x: 514.9185587108886
+        y: -71.15216229012223
+      positionAbsolute:
+        x: 514.9185587108886
+        y: -71.15216229012223
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1732134719070.text#}}'
+        desc: ''
+        selected: false
+        title: FriendlyChatApp-Output
+        type: answer
+        variables: []
+      height: 103
+      id: '1732134793547'
+      position:
+        x: 838.3879632499954
+        y: -71.15216229012223
+      positionAbsolute:
+        x: 838.3879632499954
+        y: -71.15216229012223
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "\ndef main(arg1: str) -> dict:\n    return {\n        \"dify_api_tool\"\
+          : arg1 if arg1 else \"http://hyperplane-service-016559.hyperplane-pipelines.svc.cluster.local:8787\"\
+          ,\n    }\n"
+        code_language: python3
+        desc: Assigns the DIFY_API_TOOL endpoint
+        outputs:
+          dify_api_tool:
+            children: null
+            type: string
+        selected: false
+        title: Code
+        type: code
+        variables:
+        - value_selector:
+          - '1732052853264'
+          - dify_api_tool
+          variable: arg1
+      height: 82
+      id: '1732724969420'
+      position:
+        x: -237.4077137123066
+        y: -349.470905974131
+      positionAbsolute:
+        x: -237.4077137123066
+        y: -349.470905974131
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 373.79569657345564
+      y: 507.22757447668323
+      zoom: 0.5247554102730214

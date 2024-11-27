@@ -1,5 +1,5 @@
-import os
 import json
+import os
 
 """query GetTables{
     shakudo_central_tasksCollection(first:1){
@@ -17,8 +17,10 @@ import json
 Returns:
     _type_: _description_
 """
-from connections.base import DatabaseConnection
 import requests
+
+from connections.base import DatabaseConnection
+
 SUPABASE_KEY = os.environ.get('YOUR_SUPABASE_KEY', None)
 SUPABASE_GRAPHQL_ENDPOINT = os.environ.get('SUPABASE_GRAPHQL_ENDPOINT', 'http://supabase-metaflow-kong.hyperplane-supabase-metaflow.svc.cluster.local:80/graphql/v1')
 SUPABASE_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE4MzQ3MDA0MDAsImlhdCI6MTY3NjkzNDAwMCwiaXNzIjoic3VwYWJhc2UiLCJyb2xlIjoiYW5vbiJ9.L5wyKsVw1lSYIlwMJYDC-7bfDmsBOf0Xwq1hU4QMbnA'

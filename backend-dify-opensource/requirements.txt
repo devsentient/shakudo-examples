@@ -3,8 +3,8 @@ psycopg[pool]==3.1.17
 sse-starlette==1.8.2
 psycopg2==2.9.9
 tomark==0.1.4
-langchain
-langchain-core
-langchain-experimental
-langchain-openai
-uvicorn
+langchain==0.3.7
+langchain-core==0.3.19
+langchain-experimental==0.3.3
+langchain-openai==0.2.9
+uvicorn==0.32.0
