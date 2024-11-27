@@ -1,0 +1,7 @@
+apiVersion: v1
+description: Shakudo helm app
+name: helm-app
+version: 0.0.1
+appVersion: "0.0.1"
+type: application
+home: "shakudo.io"

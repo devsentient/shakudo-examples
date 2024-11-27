@@ -1,0 +1,34 @@
+image: gcr.io/hyperplane-test/local/roman/helm-app:0.0.1
+imagePullPolicy: Always
+replicas: 1
+
+port: 80
+
+istio:
+  enabled: true
+
+resources:
+  limits:
+    memory: 500Mi
+    cpu: 1
+  requests:
+    memory: 100Mi
+    cpu: 100m
+
+readinessProbe:
+  enabled: true
+  path: "/healthz"
+  failureThreshold: 5
+  initialDelaySeconds: 3
+  periodSeconds: 15
+  successThreshold: 1
+  timeoutSeconds: 5
+
+livenessProbe:
+  enabled: true
+  path: "/readyz"
+  failureThreshold: 5
+  initialDelaySeconds: 3
+  periodSeconds: 15
+  successThreshold: 1
+  timeoutSeconds: 5
