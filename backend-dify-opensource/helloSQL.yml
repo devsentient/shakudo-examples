@@ -210,8 +210,9 @@ workflow:
         memory:
           query_prompt_template: "{{#1732052927085.body#}}\n\n---\n\nIMPORTANT GUIDELINES:\
             \ \n\n- Always output as dictionary like mentioned below:\n{\"data\":\
-            \ \"table_1, table_2, table_3\"}\n- DO NOT output in any other format.\
-            \ \n- DO NOT make up facts or modify data.\n- Ignore {{#sys.query#}}"
+            \ \"table_1, table_2, table_3\"}\n- DO NOT add any extra strings or markdown\
+            \ code along with it. \n- DO NOT output in any other format. \n- DO NOT\
+            \ make up facts or modify data.\n- Ignore {{#sys.query#}}"
           role_prefix:
             assistant: ''
             user: ''
@@ -227,12 +228,12 @@ workflow:
         prompt_template:
         - id: ea697842-5436-4646-85d4-fc948fa29d82
           role: system
-          text: 'I will give you tables and their column names, return table names
-            which are the most related to the prompt provided by the user.
-
-            If nothing is directly related, randomly pick some.
-
-            '
+          text: "I will give you tables and their column names, return table names\
+            \ which are the most related to the prompt provided by the user.\nIf nothing\
+            \ is directly related, randomly pick some.\n\nIMPORTANT GUIDELINES: \n\
+            - Always output as dictionary like mentioned below:\n{\"data\": \"table_1,\
+            \ table_2, table_3\"}\n- DO NOT add any extra strings or markdown code\
+            \ along with it. \n"
         selected: false
         title: TableRecommender
         type: llm
@@ -368,14 +369,14 @@ workflow:
         - edition_type: basic
           id: 32bf8e28-2b70-4c91-b4df-ea11b4219987
           role: system
-          text: 'You are an expert in postgresql, create a syntactically correct postgresql
-            query to run
-
-            based on user questions.'
+          text: "You are an expert in postgresql, create a syntactically correct postgresql\
+            \ query to run\nbased on user questions.\n\nIMPORTANT GUIDELINES: \n-\
+            \ Always output as dictionary like this \n{\"data\": \"SQL query to run\"\
+            }\n- DO NOT add any extra strings or markdown code along with it. "
         - id: 0a2e8c94-7a45-4760-b881-255a31d399ef
           role: user
           text: "{{#1732114740586.body#}}\n\nIMPORTANT GUIDELINES: \n- Always output\
-            \ as dictionary like this \n{\"data\": \"SQL query to run\"}\n- Do NOT\
+            \ as dictionary like this \n{\"data\": \"SQL query to run\"}\n- DO NOT\
             \ add any extra strings or markdown code along with it. \n- DO NOT output\
             \ in any other format. \n- DO NOT make up facts or modify data."
         selected: false
@@ -392,7 +393,7 @@ workflow:
       positionAbsolute:
         x: 1480.478231821482
         y: -445.31675362234716
-      selected: false
+      selected: true
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -566,12 +567,12 @@ workflow:
       height: 103
       id: '1732134793547'
       position:
-        x: 851.3840103887368
+        x: 838.3879632499954
         y: -71.15216229012223
       positionAbsolute:
-        x: 851.3840103887368
+        x: 838.3879632499954
         y: -71.15216229012223
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -608,6 +609,6 @@ workflow:
       type: custom
       width: 244
     viewport:
-      x: 193.54060601309243
-      y: 511.42248395568265
-      zoom: 0.6155717899908217
+      x: 373.79569657345564
+      y: 507.22757447668323
+      zoom: 0.5247554102730214
