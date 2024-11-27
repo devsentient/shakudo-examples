@@ -117,17 +117,6 @@ workflow:
       zIndex: 0
     - data:
         isInIteration: false
-        sourceType: start
-        targetType: question-classifier
-      id: 1732052853264-source-1732134622261-target
-      source: '1732052853264'
-      sourceHandle: source
-      target: '1732134622261'
-      targetHandle: target
-      type: custom
-      zIndex: 0
-    - data:
-        isInIteration: false
         sourceType: question-classifier
         targetType: http-request
       id: 1732134622261-1-1732052927085-target
@@ -159,6 +148,28 @@ workflow:
       targetHandle: target
       type: custom
       zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: code
+      id: 1732052853264-source-1732724969420-target
+      source: '1732052853264'
+      sourceHandle: source
+      target: '1732724969420'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: code
+        targetType: question-classifier
+      id: 1732724969420-source-1732134622261-target
+      source: '1732724969420'
+      sourceHandle: source
+      target: '1732134622261'
+      targetHandle: target
+      type: custom
+      zIndex: 0
     nodes:
     - data:
         desc: ''
@@ -172,13 +183,19 @@ workflow:
           required: true
           type: text-input
           variable: schema
-      height: 90
+        - label: dify_api_tool
+          max_length: 50
+          options: []
+          required: false
+          type: text-input
+          variable: dify_api_tool
+      height: 116
       id: '1732052853264'
       position:
-        x: -665.176596538301
+        x: -593.6983372752245
         y: -349.470905974131
       positionAbsolute:
-        x: -665.176596538301
+        x: -593.6983372752245
         y: -349.470905974131
       selected: false
       sourcePosition: right
@@ -189,7 +206,7 @@ workflow:
         context:
           enabled: false
           variable_selector: []
-        desc: ''
+        desc: LLM Node to get the most related tables to the user query.
         memory:
           query_prompt_template: "{{#1732052927085.body#}}\n\n---\n\nIMPORTANT GUIDELINES:\
             \ \n\n- Always output as dictionary like mentioned below:\n{\"data\":\
@@ -222,13 +239,13 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 98
+      height: 142
       id: llm
       position:
-        x: 340.7318344675822
+        x: 838.3879632499954
         y: -445.31675362234716
       positionAbsolute:
-        x: 340.7318344675822
+        x: 838.3879632499954
         y: -445.31675362234716
       selected: false
       sourcePosition: right
@@ -245,10 +262,10 @@ workflow:
       height: 103
       id: answer
       position:
-        x: 1830.0327921627638
+        x: 2433.2818039474496
         y: -445.31675362234716
       positionAbsolute:
-        x: 1830.0327921627638
+        x: 2433.2818039474496
         y: -445.31675362234716
       selected: false
       sourcePosition: right
@@ -262,7 +279,7 @@ workflow:
         body:
           data: []
           type: none
-        desc: ''
+        desc: API to fetch the PROMPT to get relevant tables related to the query.
         headers: ''
         method: get
         params: 'schema:{{#1732052853264.schema#}}
@@ -275,15 +292,15 @@ workflow:
           max_write_timeout: 0
         title: /recommendTables
         type: http-request
-        url: http://hyperplane-service-016559.hyperplane-pipelines.svc.cluster.local:8787/recommendTables
+        url: '{{#1732724969420.dify_api_tool#}}/recommendTables'
         variables: []
-      height: 142
+      height: 157
       id: '1732052927085'
       position:
-        x: 51.47592289453664
+        x: 514.9185587108886
         y: -445.31675362234716
       positionAbsolute:
-        x: 51.47592289453664
+        x: 514.9185587108886
         y: -445.31675362234716
       selected: false
       sourcePosition: right
@@ -309,7 +326,7 @@ workflow:
 
               }'
           type: json
-        desc: ''
+        desc: API to fetch the prompt for generating SQL.
         headers: ''
         method: post
         params: ''
@@ -320,15 +337,15 @@ workflow:
           max_write_timeout: 0
         title: /generateSQL
         type: http-request
-        url: http://hyperplane-service-016559.hyperplane-pipelines.svc.cluster.local:8787/generateSQL
+        url: '{{#1732724969420.dify_api_tool#}}/generateSQL'
         variables: []
-      height: 142
+      height: 157
       id: '1732114740586'
       position:
-        x: 635.2114205160724
+        x: 1163.733161252996
         y: -445.31675362234716
       positionAbsolute:
-        x: 635.2114205160724
+        x: 1163.733161252996
         y: -445.31675362234716
       selected: false
       sourcePosition: right
@@ -339,7 +356,8 @@ workflow:
         context:
           enabled: false
           variable_selector: []
-        desc: ''
+        desc: LLM Node to generate the SQL command using the prompt from previous
+          step.
         model:
           completion_params:
             temperature: 0.7
@@ -357,8 +375,8 @@ workflow:
         - id: 0a2e8c94-7a45-4760-b881-255a31d399ef
           role: user
           text: "{{#1732114740586.body#}}\n\nIMPORTANT GUIDELINES: \n- Always output\
-            \ as dictionary like this \n{\"data\": 'SQL query to run'}\n- Do NOT add\
-            \ any extra strings or markdown code along with it. \n- DO NOT output\
+            \ as dictionary like this \n{\"data\": \"SQL query to run\"}\n- Do NOT\
+            \ add any extra strings or markdown code along with it. \n- DO NOT output\
             \ in any other format. \n- DO NOT make up facts or modify data."
         selected: false
         title: getSQLCommand
@@ -366,15 +384,15 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 98
+      height: 158
       id: '1732114905941'
       position:
-        x: 935.7114321611319
+        x: 1480.478231821482
         y: -445.31675362234716
       positionAbsolute:
-        x: 935.7114321611319
+        x: 1480.478231821482
         y: -445.31675362234716
-      selected: true
+      selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
@@ -390,7 +408,7 @@ workflow:
             type: text
             value: '{{#1732114905941.text#}}'
           type: json
-        desc: ''
+        desc: API to execute the SQL command.
         headers: ''
         method: post
         params: ''
@@ -401,15 +419,15 @@ workflow:
           max_write_timeout: 0
         title: /executeSQL
         type: http-request
-        url: http://hyperplane-service-016559.hyperplane-pipelines.svc.cluster.local:8787/validateAndExecuteSQL
+        url: '{{#1732724969420.dify_api_tool#}}/validateAndExecuteSQL'
         variables: []
-      height: 142
+      height: 141
       id: '1732120903055'
       position:
-        x: 1230.8022259902841
+        x: 1824.3042024209135
         y: -445.31675362234716
       positionAbsolute:
-        x: 1230.8022259902841
+        x: 1824.3042024209135
         y: -445.31675362234716
       selected: false
       sourcePosition: right
@@ -420,7 +438,7 @@ workflow:
         context:
           enabled: false
           variable_selector: []
-        desc: ''
+        desc: LLM Node to prettify the output.
         model:
           completion_params:
             temperature: 0.7
@@ -450,13 +468,13 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 98
+      height: 126
       id: '1732133949728'
       position:
-        x: 1529.4863911562384
+        x: 2129.4863911562384
         y: -445.31675362234716
       positionAbsolute:
-        x: 1529.4863911562384
+        x: 2129.4863911562384
         y: -445.31675362234716
       selected: false
       sourcePosition: right
@@ -469,7 +487,7 @@ workflow:
           name: SQL or data related user query
         - id: '2'
           name: General greetings or normal chat
-        desc: ''
+        desc: Classifies if message is general or NLPSQL related user question.
         instructions: ''
         model:
           completion_params:
@@ -486,13 +504,13 @@ workflow:
         type: question-classifier
         vision:
           enabled: false
-      height: 176
+      height: 220
       id: '1732134622261'
       position:
-        x: -311.60139467667875
+        x: 137.3195573354551
         y: -349.470905974131
       positionAbsolute:
-        x: -311.60139467667875
+        x: 137.3195573354551
         y: -349.470905974131
       selected: false
       sourcePosition: right
@@ -503,7 +521,7 @@ workflow:
         context:
           enabled: false
           variable_selector: []
-        desc: ''
+        desc: LLM Node to return friendly chatbot like responses.
         model:
           completion_params:
             temperature: 0.7
@@ -525,14 +543,14 @@ workflow:
         variables: []
         vision:
           enabled: false
-      height: 98
+      height: 142
       id: '1732134719070'
       position:
-        x: 69.24661848343999
-        y: -66.27864461309429
+        x: 514.9185587108886
+        y: -71.15216229012223
       positionAbsolute:
-        x: 69.24661848343999
-        y: -66.27864461309429
+        x: 514.9185587108886
+        y: -71.15216229012223
       selected: false
       sourcePosition: right
       targetPosition: left
@@ -548,17 +566,48 @@ workflow:
       height: 103
       id: '1732134793547'
       position:
-        x: 389.4670112378616
-        y: -66.27864461309429
+        x: 851.3840103887368
+        y: -71.15216229012223
       positionAbsolute:
-        x: 389.4670112378616
-        y: -66.27864461309429
+        x: 851.3840103887368
+        y: -71.15216229012223
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "\ndef main(arg1: str) -> dict:\n    return {\n        \"dify_api_tool\"\
+          : arg1 if arg1 else \"http://hyperplane-service-016559.hyperplane-pipelines.svc.cluster.local:8787\"\
+          ,\n    }\n"
+        code_language: python3
+        desc: Assigns the DIFY_API_TOOL endpoint
+        outputs:
+          dify_api_tool:
+            children: null
+            type: string
+        selected: false
+        title: Code
+        type: code
+        variables:
+        - value_selector:
+          - '1732052853264'
+          - dify_api_tool
+          variable: arg1
+      height: 82
+      id: '1732724969420'
+      position:
+        x: -237.4077137123066
+        y: -349.470905974131
+      positionAbsolute:
+        x: -237.4077137123066
+        y: -349.470905974131
       selected: false
       sourcePosition: right
       targetPosition: left
       type: custom
       width: 244
     viewport:
-      x: 329.8836800075858
-      y: 441.42248395568265
+      x: 193.54060601309243
+      y: 511.42248395568265
       zoom: 0.6155717899908217
