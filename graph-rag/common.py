@@ -17,7 +17,7 @@ OLLAMA_EMBEDDING_ENDPOINT="http://ollama-cpu.hyperplane-ollama.svc.cluster.local
 neo4j_params = {
   "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
   "user": os.environ.get('NEO4J_USER', "neo4j"),
-  "password": os.environ.get('NEO4J_PASSWORD', "Shakudo312!")
+  "password": os.environ.get('NEO4J_PASSWORD', "your password!")
 }
 
 driver = GraphDatabase.driver(
