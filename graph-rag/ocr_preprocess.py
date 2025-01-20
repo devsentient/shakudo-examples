@@ -1,6 +1,6 @@
 from minio import Minio
 from minio.error import S3Error
-import os, glob
+import os, glob, sys
 import pypdfium2 as pdfium
 
 # Access Dataset
@@ -43,8 +43,16 @@ def ocr_get_text(src, dst):
     print(f"{pdf_file} preprocessed. Output: {txt_filename}")
 
 if __name__ == "__main__":
-    DATADIR_PDF = './graphrag-data/raw'
-    DATADIR_TXT = './graphrag-data/txt'
+    DATADIR = None
+    if len(sys.argv) > 1:
+      DATADIR = sys.argv[1]
+      print(f"DATADIR: {DATADIR}")
+    else:
+      print("No arguments were provided.")
+      exit()
+
+    DATADIR_PDF = f'./{DATADIR}/raw'
+    DATADIR_TXT = f'./{DATADIR}/txt'
     downloader = MinioDownloader(DATASET_MINIO_ENDPOINT, DATASET_MINIO_ACCESS_KEY, DATASET_MINIO_ACCESS_KEY_SECRET)
     downloader.download_bucket("datasets", "10ks", DATADIR_PDF)
 
