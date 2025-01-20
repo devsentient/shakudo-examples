@@ -34,7 +34,8 @@ def ocr_get_text(src, dst):
   res = []
   for pdf_file in pdf_files:
     pdf = pdfium.PdfDocument(pdf_file)
-    all_texts = "\n ".join([f"Page {[i+1]}: \n" + pdf[i].get_textpage().get_text_range() for i in range(len(pdf))])
+    page_delimit = '\n\n' + '-' * 16 + '\n\n'
+    all_texts = page_delimit.join([pdf[i].get_textpage().get_text_range() for i in range(len(pdf))])
 
     txt_filename = pdf_file.split("/")[-1].split(".")[0] + '.txt'
     with open(os.path.join(dst, txt_filename), "w", encoding="utf-8") as f:

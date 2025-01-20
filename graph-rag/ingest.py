@@ -3,8 +3,9 @@ from tqdm import tqdm
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from common import graph, embedding_model
+import os
 
-DATADIR = sys.argv[1]
+DATADIR = os.path.join(sys.argv[1], 'txt')
 files = glob(f"{DATADIR}*.txt")
 p_text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100)
 c_text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
