@@ -5,6 +5,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from common import graph, embedding_model
 import os
 
+PROJECT_TAG = 'financial10k'
 DATADIR = os.path.join(sys.argv[1], 'txt')
 files = glob(f"{DATADIR}*.txt")
 p_text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100)
@@ -53,7 +54,8 @@ for file_path in tqdm(files):
       MERGE (p:Page {{id: $id}})
       SET p.text = $text,
           p.page_number = $page_number,
-          p:{filename}
+          p:{filename},
+          p:{PROJECT_TAG}
       WITH p
       CALL db.create.setVectorProperty(p, 'embedding', $embedding)
       YIELD node
@@ -61,7 +63,8 @@ for file_path in tqdm(files):
       UNWIND $children AS chunk
       MERGE (c:Chunk {{id: chunk.id}})
       SET c.text = chunk.text,
-          c:{filename}
+          c:{filename},
+          c:{PROJECT_TAG}
       MERGE (c)<-[:HAS_CHILD]-(p)
       WITH c, chunk
       CALL db.create.setVectorProperty(c, 'embedding', chunk.embedding)
