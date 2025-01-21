@@ -4,7 +4,7 @@ apt-get update -y && apt-get upgrade -y
 
 pip install -r requirements.txt
 pip install -U pypdfium2 minio
-DATA_DIR="graphrag-data"
+export DATADIR=graphrag-data
 
-python ocr_preprocess.py DATADIR
-python ingest.py DATADIR
+python ocr_preprocess.py $DATADIR
+python ingest.py $DATADIR
