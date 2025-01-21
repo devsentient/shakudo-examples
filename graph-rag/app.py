@@ -41,12 +41,27 @@ neo4j_query = """
     order by score desc
     limit $inner_K
     return page_node, score
+
+    union all
+    
+    match (question_node: Question)-[:HAS_QUESTION]->(page_node:Page)
+    where (
+      $symbol in labels(question_node) OR 
+      question_node.symbol = $symbol OR 
+      question_node.symbol IS NULL OR 
+      question_node.symbol = ''
+    )
+    with page_node, vector.similarity.cosine(question_node.embedding, $prompt_embedding) as score
+    order by score desc
+    limit $inner_K
+    return page_node, score
   }
   
   with page_node, avg(score) as avg_score
   return page_node.text as text,
         page_node.page_number as page_number,
-        avg_score as score
+        avg_score as score,
+        page_node.filename as filename
   order by avg_score desc
   limit $K
 """
@@ -69,9 +84,9 @@ async def retrieve_context(query, symbol):
     # results = sess.run(neo4j_query, parameters)
     results = run_query(sess, neo4j_query, parameters)
   result = sorted(results, key=lambda x: x['score'], reverse=True)
-  
+
   matched_texts = "  \n\n---\n\n  ".join([
-              f"{pl['filename']} ON PAGE {pl['page_number']}: \n"
+              f"FILENAME {pl['filename']} ON PAGE {pl['page_number']}: \n"
               + re.sub(r' {3,}', ' ', pl["text"]) +
               f"\n ON PAGE: {pl['page_number']}"
               for pl in result])
@@ -87,7 +102,7 @@ async def get_answer(req: Request, query: str):
   print(f"Symbol extracted: {symbol}")
 
   contexts = await retrieve_context(query, symbol)
-  
+  print("Contexts: ", contexts)
   formatted_prompt = PROMPT_QWEN.format_prompt(
     document=contexts,
     question=query

@@ -74,7 +74,7 @@ From the provided document, there might be a table with markdown format as in:
 | Column 1 | Column 2 |
 | Value 1 | Value 2 |
 
-The answer will include 2 parts: the wanted value and the page number that contains that value.
+The answer will include 2 parts: the wanted value, and the filename and page number that contains that value.
 If you can't find any relevant answer, please return <missing>
 
 <|im_end|>
