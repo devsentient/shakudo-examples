@@ -53,8 +53,9 @@ async def retrieve_context(query):
   }
   
   with driver.session() as sess:
-    results = sess.run(neo4j_query, parameters)
-  result = sorted(list(results), key=lambda x: x['score'], reverse=True)
+    # results = sess.run(neo4j_query, parameters)
+    results = run_query(sess, neo4j_query, parameters)
+  result = sorted(results, key=lambda x: x['score'], reverse=True)
   
   matched_texts =  "  \n\n---\n\n  ".join([
               f" ON PAGE {pl['page_number']}: \n"
