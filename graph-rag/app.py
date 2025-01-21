@@ -16,9 +16,6 @@ def uniform_grab_value(x):
 neo4j_query = """
   CALL {
     match (page_node: Page)
-    where (
-      $filename in labels(page_node)
-    )
     with page_node,
         vector.similarity.cosine(page_node.embedding, $prompt_embedding) as score
     order by score desc
@@ -28,9 +25,6 @@ neo4j_query = """
     union all
     
     match (chunk_node: Chunk)-[:HAS_CHILD]->(page_node:Page)
-    where (
-      $filename in labels(chunk_node)
-    )
     with page_node, vector.similarity.cosine(chunk_node.embedding, $prompt_embedding) as score
     order by score desc
     limit $inner_K
@@ -50,13 +44,12 @@ def run_query(tx, neo4j_query, parameters):
   return [record.data() for record in result]
 
 
-async def retrieve_context(query, document):
+async def retrieve_context(query):
   embedding = await embedding_model.aembed_query(query)
   parameters = {
     'prompt_embedding': embedding,
     'K': 5,
     'inner_K': 5,
-    'filename': document
   }
   
   with driver.session() as sess:
@@ -74,8 +67,8 @@ async def retrieve_context(query, document):
 
 
 @app.get('/answer')
-async def get_answer(req: Request, query: str, document: str):
-  contexts = await retrieve_context(query, document)
+async def get_answer(req: Request, query: str):
+  contexts = await retrieve_context(query)
   
   formatted_prompt = PROMPT_QWEN.format_prompt(
     document=contexts,
