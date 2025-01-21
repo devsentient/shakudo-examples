@@ -145,7 +145,6 @@ for file_path in tqdm(files):
       """,
       parent,
     )
-    break
 
     
 # graph.query(
