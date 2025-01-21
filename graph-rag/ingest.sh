@@ -1,4 +1,6 @@
-cd graph-rag
+if [ "$(basename $PWD)" != "graph-rag" ]; then
+  cd graph-rag || exit 1
+fi
 
 apt-get update -y && apt-get upgrade -y
 

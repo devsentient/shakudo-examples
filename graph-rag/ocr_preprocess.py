@@ -5,8 +5,9 @@ import pypdfium2 as pdfium
 
 # Access Dataset
 DATASET_MINIO_ENDPOINT = os.environ.get("DATASET_MINIO_ENDPOINT", 'minio.hyperplane-minio.svc.cluster.local:9000')
-DATASET_MINIO_ACCESS_KEY = os.environ.get('DATASET_MINIO_ACCESS_KEY', "")
-DATASET_MINIO_ACCESS_KEY_SECRET = os.environ.get('DATASET_MINIO_ACCESS_KEY_SECRET', "")
+DATASET_MINIO_ACCESS_KEY = os.environ.get('DATASET_MINIO_ACCESS_KEY', "PROVIDE_ACCESS_KEY")
+DATASET_MINIO_ACCESS_KEY_SECRET = os.environ.get('DATASET_MINIO_ACCESS_KEY_SECRET', "PROVIDE_ACCESS_KEY_SECRET")
+DEFAULT_DATA_DIR = "graphrag-data"
 
 class MinioDownloader:
     def __init__(self, endpoint, access_key, secret_key):
@@ -44,14 +45,7 @@ def ocr_get_text(src, dst):
     print(f"{pdf_file} preprocessed. Output: {txt_filename}")
 
 if __name__ == "__main__":
-    DATADIR = None
-    if len(sys.argv) > 1:
-      DATADIR = sys.argv[1]
-      print(f"DATADIR: {DATADIR}")
-    else:
-      print("No arguments were provided.")
-      exit()
-
+    DATADIR = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_DATA_DIR
     DATADIR_PDF = f'./{DATADIR}/raw'
     DATADIR_TXT = f'./{DATADIR}/txt'
     downloader = MinioDownloader(DATASET_MINIO_ENDPOINT, DATASET_MINIO_ACCESS_KEY, DATASET_MINIO_ACCESS_KEY_SECRET)

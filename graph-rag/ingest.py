@@ -7,8 +7,10 @@ from prompts import PROMPT_QU_QWEN, PROMPT_EXTRACT
 import os, sys, logging
 logging.getLogger("neo4j").setLevel(logging.ERROR)
 
+DEFAULT_DATA_DIR = "graphrag-data"
 PROJECT_TAG = 'financial10k'
-DATADIR = os.path.join(sys.argv[1], 'txt')
+DATADIR = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_DATA_DIR
+DATADIR = os.path.join(DATADIR, 'txt')
 files = glob(f"{DATADIR}/*.txt")
 p_text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=100)
 c_text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=100)
