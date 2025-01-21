@@ -20,7 +20,8 @@ neo4j_query = """
       $symbol in labels(page_node) OR
       page_node.symbol = $symbol OR 
       page_node.symbol IS NULL OR 
-      page_node.symbol = ''
+      page_node.symbol = '' OR 
+      $symbol = ''
     )
     with page_node,
         vector.similarity.cosine(page_node.embedding, $prompt_embedding) as score
@@ -35,7 +36,8 @@ neo4j_query = """
       $symbol in labels(chunk_node) OR 
       chunk_node.symbol = $symbol OR 
       chunk_node.symbol IS NULL OR 
-      chunk_node.symbol = ''
+      chunk_node.symbol = '' OR 
+      $symbol = ''
     )
     with page_node, vector.similarity.cosine(chunk_node.embedding, $prompt_embedding) as score
     order by score desc
@@ -49,7 +51,8 @@ neo4j_query = """
       $symbol in labels(question_node) OR 
       question_node.symbol = $symbol OR 
       question_node.symbol IS NULL OR 
-      question_node.symbol = ''
+      question_node.symbol = '' OR 
+      $symbol = ''
     )
     with page_node, vector.similarity.cosine(question_node.embedding, $prompt_embedding) as score
     order by score desc
