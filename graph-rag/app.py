@@ -70,8 +70,8 @@ async def retrieve_context(query, symbol):
     results = run_query(sess, neo4j_query, parameters)
   result = sorted(results, key=lambda x: x['score'], reverse=True)
   
-  matched_texts =  "  \n\n---\n\n  ".join([
-              f" ON PAGE {pl['page_number']}: \n"
+  matched_texts = "  \n\n---\n\n  ".join([
+              f"{pl['filename']} ON PAGE {pl['page_number']}: \n"
               + re.sub(r' {3,}', ' ', pl["text"]) +
               f"\n ON PAGE: {pl['page_number']}"
               for pl in result])
