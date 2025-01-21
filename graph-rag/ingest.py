@@ -64,7 +64,7 @@ for file_path in tqdm(files):
     )
     questions = uniform_grab_value(chat_model.invoke(formatted_prompt)).splitlines()
     questions = [q for q in questions if q != '' and q.split('.')[0].isdigit()]
-    print("here:", questions, len(questions))
+
     if len(questions) != 5:
       questions = [""] * 5
 
