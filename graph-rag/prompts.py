@@ -9,9 +9,11 @@ There are some guidelines:
 2. The question has to mention the given date in a natural way
 And if the question has month information, it has to include year as well
     E.g: from Jun_2023, you can ask "in the quarter of June 2023" or "in June 2023"
-3. Please prioritize questions that ask for financial numbers.
-4. Please do not generate yes/no question.
-5. Always generate 5 questions
+3. The question must use the trading ticker symbol if it is provided.
+    E.g: Summarize MSTR 2023 10k earning call report
+4. Please prioritize questions that ask for financial numbers.
+5. Please do not generate yes/no question.
+6. Always generate 5 questions, number them from 1 to 5 numerically.
 
 From the provided document, there might be a table with markdown format as in:
 
@@ -21,6 +23,9 @@ From the provided document, there might be a table with markdown format as in:
 Please generate each question in a new line.
 <|im_end|>
 <|im_start|>user
+This is the given date: {date}
+This is the company name: {company_name}
+This is the extracted trading ticker symbol (can be empty): {symbol}
 From the text chunk:
 {document}
 
@@ -32,7 +37,29 @@ Please generate the questions.
 """
 
 PROMPT_QU_QWEN = PromptTemplate(
-    template=QWEN2_QU_PROMPT_TEMPLATE, input_variables=["document"]
+    template=QWEN2_QU_PROMPT_TEMPLATE, input_variables=["document", "date", "company_name", "symbol"]
+)
+
+QWEN2_EXTRACT_TEMPLATE = """
+<|im_start|>system
+Given document first page content, extract the company name, month and year the document is about, and its trading symbol. The output must be in the format "Month_Year|SYMBOL|COMPANY_NAME". E.g January_2022|DGLY|Digital_Ally or December_2024|MSTR|MICROSTRATEGY_INC
+If no trading ticker symbol information can be found, return "NONE" as the symbol in the final answer.
+
+Guidelines:
+- DO NOT return anything except for the answer formatted in "January_2022|DGLY|Digital_Ally" or just an empty string "December_2024|NONE|CARVANA_AUTO_RECEIVABLES_TRUST".
+- DO NOT add any extra information or string to the output.
+
+<|im_end|>
+<|im_start|>user
+This is the document first page content: {page}
+Extract company name, month and year the document is about, and its trading ticker symbol.
+
+<|im_end|>
+<|im_start|> assistant
+"""
+
+PROMPT_EXTRACT = PromptTemplate(
+    template=QWEN2_EXTRACT_TEMPLATE, input_variables=["page"]
 )
 
 QWEN2_PROMPT_TEMPLATE = """

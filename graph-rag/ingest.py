@@ -3,10 +3,8 @@ from tqdm import tqdm
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from common import graph, embedding_model, chat_model
-from prompts import PROMPT_QU_QWEN
-import os, sys
-
-import logging
+from prompts import PROMPT_QU_QWEN, PROMPT_EXTRACT
+import os, sys, logging
 logging.getLogger("neo4j").setLevel(logging.ERROR)
 
 PROJECT_TAG = 'financial10k'
@@ -31,9 +29,14 @@ for file_path in tqdm(files):
   for i, page in enumerate(pages):
     parent_docs.append(Document(page_content=page, metadata={'page_number': i + 1}))
   
+  # get company trading symbol and 10k month/year
+  formatted_prompt = PROMPT_EXTRACT.format(page=pages[0])
+  answer = uniform_grab_value(chat_model.invoke(formatted_prompt))
+  date, symbol, company_name = answer.split('|')
+
   p_doc_chunks = p_text_splitter.split_documents(parent_docs)
 
-  for id, p_chunk in enumerate(p_doc_chunks):
+  for id, p_chunk in enumerate(tqdm(p_doc_chunks, leave=False)):
     
     p_embedding = embedding_model.embed_query(p_chunk.page_content)
     child_documents = c_text_splitter.split_documents([p_chunk])
@@ -46,16 +49,22 @@ for file_path in tqdm(files):
         'text': c.page_content,
         'id': f"{filename}-{id}-{ic}",
         'embedding': c_embedding,
+        "date": date,
+        "companyname": company_name,
+        "symbol": symbol
       }
       children.append(child_data)
 
     # questions
     formatted_prompt = PROMPT_QU_QWEN.format(
-      document=p_chunk.page_content
+      document=p_chunk.page_content,
+      date=date,
+      company_name=company_name,
+      symbol=symbol
     )
     questions = uniform_grab_value(chat_model.invoke(formatted_prompt)).splitlines()
     questions = [q for q in questions if q != '' and q.split('.')[0].isdigit()]
-
+    print("here:", questions, len(questions))
     if len(questions) != 5:
       questions = [""] * 5
 
@@ -66,6 +75,9 @@ for file_path in tqdm(files):
         "text": question,
         "id": f"{filename}-{id}-q{iq}",
         "embedding": q_embedding,
+        "date": date,
+        "companyname": company_name,
+        "symbol": symbol
       })
     
     # parent
@@ -77,7 +89,10 @@ for file_path in tqdm(files):
       "questions": q_nodes,
       "id": f'{filename}-{id}',
       "filename": filename, 
-      "project": PROJECT_TAG
+      "project": PROJECT_TAG,
+      "date": date,
+      "companyname": company_name,
+      "symbol": symbol
     }
     
     graph.query(
@@ -86,7 +101,10 @@ for file_path in tqdm(files):
       SET p.text = $text,
           p.page_number = $page_number,
           p.filename = $filename,
-          p.project = $project
+          p.project = $project,
+          p.date = CASE WHEN $date IS NOT NULL AND $date <> "" THEN $date ELSE "" END,
+          p.company_name = CASE WHEN $companyname IS NOT NULL AND $companyname <> "" THEN $companyname ELSE "" END,
+          p.symbol = CASE WHEN $symbol IS NOT NULL AND $symbol <> "NONE" THEN $symbol ELSE "" END
       WITH p
       CALL db.create.setVectorProperty(p, 'embedding', $embedding)
       YIELD node
@@ -95,7 +113,10 @@ for file_path in tqdm(files):
       MERGE (c:Chunk {id: chunk.id})
       SET c.text = chunk.text,
           c.filename = $filename,
-          c.project = $project
+          c.project = $project,
+          c.date = CASE WHEN $date IS NOT NULL AND $date <> "" THEN $date ELSE "" END,
+          c.company_name = CASE WHEN $companyname IS NOT NULL AND $companyname <> "" THEN $companyname ELSE "" END,
+          c.symbol = CASE WHEN $symbol IS NOT NULL AND $symbol <> "NONE" THEN $symbol ELSE "" END
       MERGE (c)<-[:HAS_CHILD]-(p)
       WITH c, chunk
       CALL db.create.setVectorProperty(c, 'embedding', chunk.embedding)
@@ -112,7 +133,10 @@ for file_path in tqdm(files):
       UNWIND $questions as question
       MERGE (q:Question {id: question.id})
       SET q.text = question.text,
-          q.project = $project
+          q.project = $project,
+          q.date = CASE WHEN $date IS NOT NULL AND $date <> "" THEN $date ELSE "" END,
+          q.company_name = CASE WHEN $companyname IS NOT NULL AND $companyname <> "" THEN $companyname ELSE "" END,
+          q.symbol = CASE WHEN $symbol IS NOT NULL AND $symbol <> "NONE" THEN $symbol ELSE "" END
       MERGE (q)<-[:HAS_QUESTION]-(p)
       WITH q, question
       CALL db.create.setVectorProperty(q, 'embedding', question.embedding)
@@ -121,8 +145,7 @@ for file_path in tqdm(files):
       """,
       parent,
     )
-
-    print(f"Ingested page {id+1}/{len(p_doc_chunks)}")
+    break
 
     
 # graph.query(
