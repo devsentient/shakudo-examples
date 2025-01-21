@@ -119,3 +119,19 @@ Give me answer for this question {question}
 
 PROMPT_OPENAI = PromptTemplate(template=OPENAI_PROMPT_TEMPLATE, 
                                input_variables=['document', 'question'])
+
+
+QWEN2_EXTRACT_TEMPLATE2 = """
+<|im_start|>system
+Given the user's prompt, extract the trading ticker symbol. The output has to be a single term. E.g MSTR or NMGX
+If the title doesn't contain this information, return "" (empty string)
+<|im_end|>
+<|im_start|>user
+This is the user prompt: {prompt}
+Extract trading ticker symbol
+<|im_end|>
+<|im_start|> assistant
+"""
+
+PROMPT_EXTRACT2 = PromptTemplate(template=QWEN2_EXTRACT_TEMPLATE2, 
+                             input_variables=['prompt'])
