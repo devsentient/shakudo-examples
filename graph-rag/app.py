@@ -105,7 +105,6 @@ async def get_answer(req: Request, query: str):
   print(f"Symbol extracted: {symbol}")
 
   contexts = await retrieve_context(query, symbol)
-  print("Contexts: ", contexts)
   formatted_prompt = PROMPT_QWEN.format_prompt(
     document=contexts,
     question=query
