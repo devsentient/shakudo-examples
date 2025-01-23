@@ -3,3 +3,4 @@ fastapi==0.110.3
 fpdf
 pypandoc
 markdown-pdf
+python-multipart
