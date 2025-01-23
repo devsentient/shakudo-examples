@@ -1,3 +1,5 @@
 uvicorn==0.23.2
 fastapi==0.110.3
 fpdf
+pypandoc
+markdown-pdf
