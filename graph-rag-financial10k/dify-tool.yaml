@@ -1,0 +1,45 @@
+{
+   "openapi":"3.1.0",
+   "servers":[
+      {
+         "url":<INSERT INFERENCE MICROSERVICE IN-CLUSTER URL>
+      }
+   ],
+   "info":{
+      "title":"GraphRAG tool",
+      "summary":"Shakudo GraphRAG inference",
+      "description":"",
+      "version":"0.0.1"
+   },
+   "paths":{
+      "/answer":{
+         "get":{
+            "summary":"Query GraphRAG",
+            "operationId":"graphrag",
+            "parameters":[
+               {
+                  "name":"query",
+                  "in":"query",
+                  "required":true,
+                  "schema":{
+                     "type":"string",
+                     "title":"query"
+                  }
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Successful Response",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
