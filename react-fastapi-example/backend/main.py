@@ -9,7 +9,7 @@ domain = os.getenv("DOMAIN", "example.com")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "https://plugins.arshia-dev-eks-cluster.canopyhub.io",
+        f"https://plugins.{domain}",
         "http://localhost:3000",
         "http://localhost:3001",
     ],
