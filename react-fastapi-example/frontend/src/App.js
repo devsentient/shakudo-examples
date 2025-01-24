@@ -4,7 +4,10 @@ function App() {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.href}/data`)
+    fetch(`${process.env.REACT_APP_BACKEND_URL || window.location.href}/data`, {
+      credentials: 'include', // Required if using cookies/sessions
+      cache: 'no-cache',
+    })
       .then((response) => response.json())
       .then((data) => setData(data.data))
       .catch((error) => console.error("Error fetching data:", error));
