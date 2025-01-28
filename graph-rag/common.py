@@ -7,9 +7,10 @@ from langchain_community.chat_models.ollama import ChatOllama
 from langchain_community.embeddings.openai import OpenAIEmbeddings
 from langchain_community.chat_models.openai import ChatOpenAI
 
-OLLAMA_EMBEDDING_MODEL='nomic-embed-text:latest'
-OLLAMA_EMBEDDING_ENDPOINT="http://ollama-cpu.hyperplane-ollama.svc.cluster.local:11434"
-
+OLLAMA_EMBEDDING_MODEL=os.environ.get("OLLAMA_EMBEDDING_MODEL", 'nomic-embed-text:latest')
+OLLAMA_EMBEDDING_ENDPOINT=os.environ.get("OLLAMA_EMBEDDING_ENDPOINT", "http://ollama.hyperplane-ollama.svc.cluster.local:11434")
+OLLAMA_CHAT_MODEL=os.environ.get("OLLAMA_CHAT_MODEL", 'qwen2.5:14b-instruct-q4_K_M')
+OLLAMA_CHAT_ENDPOINT=os.environ.get("OLLAMA_CHAT_ENDPOINT", "http://ollama.hyperplane-ollama.svc.cluster.local:11434")
 #=========================|
 #  Configure Neo4j        |
 #=========================|
@@ -17,7 +18,7 @@ OLLAMA_EMBEDDING_ENDPOINT="http://ollama-cpu.hyperplane-ollama.svc.cluster.local
 neo4j_params = {
   "URL": os.environ.get('NEO4J_URL', "neo4j://neo4j.hyperplane-neo4j.svc.cluster.local:7687"),
   "user": os.environ.get('NEO4J_USER', "neo4j"),
-  "password": os.environ.get('NEO4J_PASSWORD', "your password!")
+  "password": os.environ.get('NEO4J_PASSWORD', "") # SET THIS
 }
 
 driver = GraphDatabase.driver(
@@ -39,8 +40,8 @@ graph = Neo4jGraph(
 embedding_model = OllamaEmbeddings(base_url=OLLAMA_EMBEDDING_ENDPOINT, 
                                    model=OLLAMA_EMBEDDING_MODEL, 
                                    num_ctx=8196)
-chat_model = ChatOllama(base_url='http://ollama.hyperplane-ollama.svc.cluster.local:11434',
-                        model='qwen2.5:14b-instruct-q4_K_M',
+chat_model = ChatOllama(base_url=OLLAMA_CHAT_ENDPOINT,
+                        model=OLLAMA_CHAT_MODEL,
                         num_ctx=8196)
 
 
