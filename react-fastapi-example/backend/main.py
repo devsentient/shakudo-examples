@@ -29,17 +29,14 @@ def get_data():
     return {"data": ["Item 1", "Item 2", "Item 3"]}
 
 @app.get("/lat")
-def simulate_latency():
-    """
-    Simulates random latency with occasional high-latency spikes
-    """
-    base_latency = random.uniform(0.1, 0.5)
+def simulate_latency(response: Response):
+    latency = random.uniform(0.1, 2.0)  
+    time.sleep(latency)
 
-    if random.random() < 0.2:
-        spike_latency = random.uniform(2, 5) 
-        time.sleep(spike_latency)
-        return {"latency": f"{spike_latency:.2f} seconds (Spike)"}
+    if random.random() < 0.2:  
+        time.sleep(3)  
 
-    time.sleep(base_latency)
-    return {"latency": f"{base_latency:.2f} seconds"}
+    custom_code = 418  
+    response.status_code = custom_code
 
+    return {"message": "Simulated latency", "latency_seconds": latency, "custom_status": custom_code}
