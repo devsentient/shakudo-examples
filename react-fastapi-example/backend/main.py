@@ -33,7 +33,7 @@ def simulate_latency(response: Response):
     latency = random.uniform(0.1, 2.0)  
     time.sleep(latency)
 
-    if random.random() < 0.2:  
+    if random.random() < 0.5:  
         time.sleep(3)  
 
     custom_code = 418  
