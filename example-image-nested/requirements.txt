@@ -1,0 +1,2 @@
+gorilla-cli==0.0.9
+aider-chat==0.45.0
