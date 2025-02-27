@@ -30,7 +30,7 @@ def get_data():
 
 @app.get("/lat")
 def simulate_latency(response: Response):
-    latency = random.uniform(0.1, 2.0)  
+    latency = random.uniform(0.5, 5.0)  
     time.sleep(latency)
 
     if random.random() < 0.5:  
