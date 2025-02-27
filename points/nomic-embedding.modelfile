@@ -1,0 +1,1 @@
+FROM ./nomic-embed-text-v1.Q5_K_S.gguf
