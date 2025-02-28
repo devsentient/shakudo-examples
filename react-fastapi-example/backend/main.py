@@ -36,7 +36,7 @@ def simulate_latency(response: Response):
     if random.random() < 0.5:  
         time.sleep(3)  
 
-    custom_code = 418  
+    custom_code = 200
     response.status_code = custom_code
 
     return {"message": "Simulated latency", "latency_seconds": latency, "custom_status": custom_code}
