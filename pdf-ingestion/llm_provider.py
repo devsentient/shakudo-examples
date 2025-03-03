@@ -73,18 +73,18 @@ def pull_ollama_model(model_name):
         print("An error occurred while making the request:", str(e))
 
 
-LLM_PROVIDER = os.environ.get("HYPERPLANE_CUSTOM_SECRET_LLM_PROVIDER", 'OPENAI')
+LLM_PROVIDER = os.environ.get("HYPERPLANE_CUSTOM_SECRET_KEY_LLM_PROVIDER", 'OPENAI')
 if LLM_PROVIDER == 'OPENAI':
     print("Using OPENAI.")
-    OPENAI_API_KEY = os.environ.get('HYPERPLANE_CUSTOM_SECRET_OPENAI_API_KEY', '') # Reqired
-    GENERATION_MODEL = os.environ.get('HYPERPLANE_CUSTOM_SECRET_GENERATION_MODEL', 'gpt-4o')
-    EMBEDDING_MODEL = os.environ.get('HYPERPLANE_CUSTOM_SECRET_EMBEDDING_MODEL', 'text-embedding-3-small')
+    OPENAI_API_KEY = os.environ.get('HYPERPLANE_CUSTOM_SECRET_KEY_OPENAI_API_KEY', '') # Reqired
+    GENERATION_MODEL = os.environ.get('HYPERPLANE_CUSTOM_SECRET_KEY_GENERATION_MODEL', 'gpt-4o')
+    EMBEDDING_MODEL = os.environ.get('HYPERPLANE_CUSTOM_SECRET_KEY_EMBEDDING_MODEL', 'text-embedding-3-small')
     assert OPENAI_API_KEY
 else:
     print("Using Ollama")
-    OLLAMA_ENDPOINT = os.environ.get("HYPERPLANE_CUSTOM_SECRET_OLLAMA_ENDPOINT", 'http://ollama.hyperplane-ollama:11434')
-    GENERATION_MODEL = os.environ.get('HYPERPLANE_CUSTOM_SECRET_GENERATION_MODEL','llama3.2') # Required
-    EMBEDDING_MODEL = os.environ.get('HYPERPLANE_CUSTOM_SECRET_EMBEDDING_MODEL', 'nomic-embed-text') # Required
+    OLLAMA_ENDPOINT = os.environ.get("HYPERPLANE_CUSTOM_SECRET_KEY_OLLAMA_ENDPOINT", 'http://ollama.hyperplane-ollama:11434')
+    GENERATION_MODEL = os.environ.get('HYPERPLANE_CUSTOM_SECRET_KEY_GENERATION_MODEL','llama3.2') # Required
+    EMBEDDING_MODEL = os.environ.get('HYPERPLANE_CUSTOM_SECRET_KEY_EMBEDDING_MODEL', 'nomic-embed-text') # Required
     print("Pulling model")
     pull_ollama_model(GENERATION_MODEL)
     pull_ollama_model(EMBEDDING_MODEL)

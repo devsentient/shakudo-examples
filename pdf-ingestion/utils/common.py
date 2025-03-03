@@ -7,8 +7,8 @@ from connections.SupabasePostgresql import PostgreSQLConnection
 # from connections.DatabricksSparksql import DatabricksSQLConnection
 
 # Openai Env:
-api_key = os.environ.get("HYPERPLANE_CUSTOM_SECRET_OPENAI_API_KEY", "")
-local_llm = os.environ.get("HYPERPLANE_CUSTOM_SECRET_HYPERPLANE_JOB_PARAMETER_LLM_ENDPOINTS", "{}")         
+api_key = os.environ.get("HYPERPLANE_CUSTOM_SECRET_KEY_OPENAI_API_KEY", "")
+local_llm = os.environ.get("HYPERPLANE_CUSTOM_SECRET_KEY_HYPERPLANE_JOB_PARAMETER_LLM_ENDPOINTS", "{}")         
 local_llm_endpoints = json.loads(local_llm)        
 
 def uniform_grab_value(x):
