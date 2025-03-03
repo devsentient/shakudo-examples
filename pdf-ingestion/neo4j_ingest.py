@@ -135,7 +135,7 @@ async def ingest_folder(folder_path: str):
     Iterates through all files in a folder and ingests them asynchronously.
     """
     tasks = []
-    for file_name in os.listdir(folder_path)[:4]:
+    for file_name in os.listdir(folder_path):
         if file_name.endswith(".pdf.md"):
             file_path = os.path.join(folder_path, file_name)
             logger.info(f"Ingesting: {file_path}")
