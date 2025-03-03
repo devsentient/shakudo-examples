@@ -27,16 +27,3 @@ def get_db(database_name: str) -> DatabaseConnection:
     return db[database_name]
 
 
-def get_llm(force_json=False):
-    llm = ChatOpenAI(
-        openai_api_key=api_key,
-        model_name='gpt-4o',
-        model_kwargs={
-            'response_format': {
-                'type': 'json_object',
-            }
-        } if force_json else {},
-        max_tokens=512,
-        temperature=0
-    )
-    return llm

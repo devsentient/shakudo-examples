@@ -5,19 +5,14 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Tuple
 
 import colorlog
-from dotenv import load_dotenv
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import OllamaEmbeddings
-from neo4j import GraphDatabase
 
+from llm_provider import async_llm_embedding
+
+from neo4j import GraphDatabase
 from neo4j_config import NEO4J_PARAMS
 from neo4j_query import chunk_query, create_query
 
-
-# # OpenAI API Key
-# GENERATION_OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-# GENERATION_BASE_API  = os.getenv("GENERATION_BASE_API")
-# OpenAI API Key
 
 # Configure the color-coded logger
 def setup_logger() -> logging.Logger:
@@ -42,40 +37,13 @@ def setup_logger() -> logging.Logger:
 
 
 logger = setup_logger()
-
-# Load environment variables
-load_dotenv()
-EMBEDDING_OPENAI_API_KEY = os.getenv("EMBEDDING_OPENAI_API_KEY")
-EMBEDDING_BASE_API  = os.getenv("EMBEDDING_BASE_API")
-EMBEDDING_MODEL  = os.getenv("EMBEDDING_MODEL")
-
-
 # Neo4j driver initialization
 driver = GraphDatabase.driver(
     NEO4J_PARAMS["URL"], auth=(NEO4J_PARAMS["user"], NEO4J_PARAMS["password"])
 )
 
-
 # ThreadPool for blocking tasks
 executor = ThreadPoolExecutor(max_workers=4)
-
-# Check env:
-if not all([EMBEDDING_BASE_API, EMBEDDING_MODEL,
-           EMBEDDING_OPENAI_API_KEY]):
-    logger.error(f"""
-            One of following Env is missing:
-            EMBEDDING_BASE_API: {EMBEDDING_BASE_API}
-            EMBEDDING_OPENAI_API_KEY: {EMBEDDING_OPENAI_API_KEY}
-            EMBEDDING_MODEL: {EMBEDDING_MODEL}
-            """)
-else:
-        logger.debug(f"""
-            One of following Env is missing:
-            EMBEDDING_BASE_API: {EMBEDDING_BASE_API}
-            EMBEDDING_OPENAI_API_KEY: {EMBEDDING_OPENAI_API_KEY}
-            EMBEDDING_MODEL: {EMBEDDING_MODEL}
-            """)
-
 
 
 def split_text_on_boundary(
@@ -87,24 +55,9 @@ def split_text_on_boundary(
     splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
         encoding_name="r50k_base", 
         chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        # separators=["</Chart Analysis>", "<Chart Analysis>", "\n\n", "\n", " "],
+        chunk_overlap=chunk_overlap
     )
     return splitter.split_text(text)
-
-
-async def embed_text_with_gpt(text: str) -> List[float]:
-    """
-    Embeds text using OpenAI embeddings.
-    """
-    try:
-        embeddings = OllamaEmbeddings(model=EMBEDDING_MODEL,
-                                      base_url = EMBEDDING_BASE_API)
-        return embeddings.embed_query(text)
-    except Exception as e:
-        logger.error(f"Error embedding text: {e}")
-        return []
-
 
 def create_parent_node(
     file_name: str,
@@ -143,9 +96,11 @@ async def process_chunks(
     Processes and embeds text chunks, creating parent-child relationships.
     """
     try:
+        logger.info(f"Ingesting {len(chunks)} chunks..")
         child_embeddings = await asyncio.gather(
-            *[embed_text_with_gpt(chunk) for chunk in chunks]
+            *[async_llm_embedding(chunk, logger=logger) for chunk in chunks]
         )
+        logger.info("Embeded chunks.")
         children = [
             {"text": c, "embedding": embedding, 'chunk_n': f'{i}', 'is_last': f'{i==len(chunks)}'}
             for i, (c, embedding) in enumerate(zip(chunks, child_embeddings))
@@ -180,7 +135,7 @@ async def ingest_folder(folder_path: str):
     Iterates through all files in a folder and ingests them asynchronously.
     """
     tasks = []
-    for file_name in os.listdir(folder_path):
+    for file_name in os.listdir(folder_path)[:4]:
         if file_name.endswith(".pdf.md"):
             file_path = os.path.join(folder_path, file_name)
             logger.info(f"Ingesting: {file_path}")

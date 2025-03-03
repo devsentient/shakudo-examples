@@ -56,7 +56,7 @@ def extract_text_and_images(pdf_path, output_folder="extracted_images", resoluti
 import os
 
 
-def process_pdfs(pdf_dir, md_dir):
+def process_pdfs(pdf_dir, md_dir, keep_image=False):
     """
     Loops over all PDF files in `pdf_dir`, extracts text and images,
     then writes the results to a single Markdown file `md_file_name`.
@@ -85,16 +85,14 @@ def process_pdfs(pdf_dir, md_dir):
                         # Write a reference to the extracted image into the MD file
                         # (You could embed it using Markdown image syntax,
                         #  or simply note that an image was found.)
-
-                        # Example: embed the image if you want
                         image_path = os.path.join("extracted_images", item["id"])
                         # md_file.write(f"![Image: {item['id']}]({image_path})\n\n")
 
                         # Optionally call analyze_image(image_path) and write its output
                         analysis = analyze_image(image_path)
-                        os.remove(image_path)
-                        md_file.write(f"\n<Chart Analysis>\n {analysis}\n</Chart Analysis>
-\n")
+                        if keep_image:
+                            os.remove(image_path)
+                        md_file.write(f"\n<Chart Analysis>\n {analysis}\n</Chart Analysis>\n")
 
                 # Add a separator/newline before the next PDF
                 md_file.write("\n---\n\n")

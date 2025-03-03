@@ -8,9 +8,8 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from neo4j import GraphDatabase
 from pydantic import BaseModel
-
+from llm_provider import llm_embedding
 from neo4j_config import NEO4J_PARAMS
-from neo4j_ingest import embed_text_with_gpt
 from neo4j_query import NEO4J_QUERY_GENERAL, NEO4J_QUERY_SIBLING
 
 # Initialize the FastAPI app with custom docs URLs
@@ -84,7 +83,7 @@ async def fetch_contextual_data(
     """Fetch contextual data from the database based on the user query."""
     try:
         # Generate embedding for the query
-        embedding = await embed_text_with_gpt(query)
+        embedding = llm_embedding(query)
         query_parameters = {
             "prompt_embedding": embedding,
             "inner_K": 3,

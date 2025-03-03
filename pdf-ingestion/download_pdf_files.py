@@ -7,6 +7,9 @@ minio_host = os.getenv("MINIO_HOST", "minio.hyperplane-minio:9000")
 access_key = os.getenv("MINIO_ACCESS_KEY")
 secret_key = os.getenv("MINIO_SECRET_KEY")
 
+if not access_key or not secret_key:
+    raise Exception("MINIO_ACCESS_KEY or MINIO_SECRET_KEY is empty.")
+
 # Create a Minio client instance
 minio_client = Minio(
     minio_host,

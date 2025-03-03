@@ -1,5 +1,6 @@
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage
+from llm_provider import llm_invoke
 from PIL import Image
 import base64
 import os
@@ -20,9 +21,6 @@ def analyze_image(image_path):
     # Encode image to base64
     base64_image = encode_image(image_path)
 
-    # Initialize LangChain with OpenAI model
-    llm = ChatOpenAI(model="gpt-4o", openai_api_key=OPENAI_API_KEY)
-
     # Construct the query
     query = [
         HumanMessage(
@@ -40,7 +38,7 @@ def analyze_image(image_path):
     ]
 
     # Get response from GPT-4 Vision
-    response = llm.invoke(query)
+    response = llm_invoke(query)
 
     return response.content  # Returns either a table (markdown format) or a description
 
