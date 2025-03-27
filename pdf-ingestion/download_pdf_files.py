@@ -45,8 +45,8 @@ def download_all_files(bucket_name, prefix, download_dir):
 
 # Usage
 bucket_name = os.getenv('BUCKET_NAME', 'shakudo-poc')
-object_prefix = os.getenv('OBJECT_KEY', 'rag-chat-financial10k/md/')
-download_path = './pdf_output'
+object_prefix = os.getenv('OBJECT_KEY', 'rag-chat-financial10k/pdfs/')
+download_path = './pdf_input'
 
 if not bucket_name or not object_prefix or not download_path:
     print("Please set all the required environment variables.")

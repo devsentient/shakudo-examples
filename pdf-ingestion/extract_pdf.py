@@ -2,7 +2,7 @@ import pdfplumber
 from gpt_image_converter import analyze_image
 import os
 from uuid import uuid4
-
+IMAGE_EXTRACTION = False
 
 def extract_text_and_images(pdf_path, output_folder="extracted_images", resolution=200):
     os.makedirs(output_folder, exist_ok=True)
@@ -81,7 +81,7 @@ def process_pdfs(pdf_dir, md_dir, keep_image=False):
                     if item["type"] == "text":
                         # Write text content directly to the MD file
                         md_file.write(item["content"] + "\n\n")
-                    elif item["type"] == "image":
+                    elif item["type"] == "image" and IMAGE_EXTRACTION:
                         # Write a reference to the extracted image into the MD file
                         # (You could embed it using Markdown image syntax,
                         #  or simply note that an image was found.)
@@ -100,7 +100,7 @@ def process_pdfs(pdf_dir, md_dir, keep_image=False):
 
 # Example usage
 if __name__ == "__main__":
-    pdf_folder = "./PDFs"
+    pdf_folder = "./pdf_input"
     output_md = "./pdf_output"
     process_pdfs(pdf_folder, output_md)
 

@@ -43,7 +43,7 @@ driver = GraphDatabase.driver(
 )
 
 # ThreadPool for blocking tasks
-executor = ThreadPoolExecutor(max_workers=4)
+executor = ThreadPoolExecutor(max_workers=1)
 
 
 def split_text_on_boundary(
