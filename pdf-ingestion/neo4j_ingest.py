@@ -39,7 +39,7 @@ def setup_logger() -> logging.Logger:
 logger = setup_logger()
 # Neo4j driver initialization
 driver = GraphDatabase.driver(
-    NEO4J_PARAMS["URL"], auth=(NEO4J_PARAMS["user"], NEO4J_PARAMS["password"])
+    NEO4J_PARAMS["URL"], auth=(NEO4J_PARAMS["user"], "")
 )
 
 # ThreadPool for blocking tasks
@@ -148,7 +148,7 @@ async def main():
     """
     Main entry point for the ingestion process.
     """
-    folder_path = "cleanned_md"
+    folder_path = "pdf_output"
     await ingest_folder(folder_path)
 
 
