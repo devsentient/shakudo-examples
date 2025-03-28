@@ -44,8 +44,8 @@ def download_all_files(bucket_name, prefix, download_dir):
         print(f"An error occurred: {e}")
 
 # Usage
-bucket_name = os.getenv('BUCKET_NAME', 'datasets')
-object_prefix = os.getenv('OBJECT_KEY', '10ks-mini')
+bucket_name = os.getenv('BUCKET_NAME', 'shakudo-poc')
+object_prefix = os.getenv('OBJECT_KEY', 'test')
 download_path = './pdf_input'
 
 if not bucket_name or not object_prefix or not download_path:

@@ -39,7 +39,7 @@ def setup_logger() -> logging.Logger:
 logger = setup_logger()
 # Neo4j driver initialization
 driver = GraphDatabase.driver(
-    NEO4J_PARAMS["URL"], auth=(NEO4J_PARAMS["user"], "")
+    NEO4J_PARAMS["URL"], auth=(NEO4J_PARAMS["user"], NEO4J_PARAMS["password"])
 )
 
 # ThreadPool for blocking tasks
