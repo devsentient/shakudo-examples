@@ -8,6 +8,19 @@ version: 0.1.0
 import os
 import requests
 
+### SHAKUDO RAG TOOL EXAMPLE ###
+
+# Note: This is a proof-of-concept (POC) tool designed to demonstrate the 
+# potential of the GraphRag tool. Please be aware that the script provides 
+# basic functionality and should not be used as a performance benchmark.
+
+# GraphRag's performance may vary significantly depending on factors such as 
+# document type, the choice of LLM model, and the relation logic used. 
+# These aspects can be easily optimized through fine-tuning and adaptation to 
+# specific document categories.
+
+###
+
 class Tools:
     def __init__(self):
         self.citation = True
@@ -51,7 +64,7 @@ class Tools:
                 {
                     "type": "status",  # We set the type here
                     "data": {
-                        "description": "Graph RAG Result parsed" + str(result),
+                        "description": "Graph RAG Result parsed",
                         "done": True,
                         "hidden": False,
                     },
