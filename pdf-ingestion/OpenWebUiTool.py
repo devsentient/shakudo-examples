@@ -8,7 +8,6 @@ version: 0.1.0
 import os
 import requests
 
-
 class Tools:
     def __init__(self):
         self.citation = True
