@@ -1,0 +1,37 @@
+mutation {
+	createPipelineJobWithAlerting(
+		input: {
+			jobName: "test-job",
+			jobType: "basic",
+			pipelineYamlPath: "example-job/example-job.yaml",
+			noHyperplaneCommands: false,
+			workingDir: "/tmp/git/monorepo/", # remove if version <= 3.2
+			debuggable: false,
+			notificationsEnabled: false,
+			notificationTargetIds: [],
+			timeout: 86400,
+			activeTimeout: 86400,
+			maxRetries: 2,
+			gitServerName: "shakudo-examples",
+			noGitInit: false,
+			commitId: "",
+			hyperplaneUserEmail: "<USER EMAIL>",
+			serviceAccountName: "",
+			pipelineType: "YAML",
+			branchName: "example-job",
+			parameters: {}
+	}) {
+        id
+        jobName
+        jobType
+        pipelineYamlPath
+	workingDir  # remove if version <= 3.2
+        commitId
+        branchName
+        debuggable
+        parameters {
+            key
+            value
+        }
+    }
+}
