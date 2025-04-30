@@ -1,0 +1,57 @@
+{
+  "version": "1.0",
+  "name": "DynexNewDocsReport",
+  "use_step_history": false,
+  "nodes": [
+    {
+      "id": "tool_89fc99d5_b85b_423b_aad9_b372a734b62e",
+      "type": "tool",
+      "position": {
+        "x": 0,
+        "y": 320
+      },
+      "data": {
+        "label": "agent_webresearcher",
+        "originalId": "tool-89fc99d5-b85b-423b-aad9-b372a734b62e",
+        "originalLabel": "agent_webresearcher",
+        "serviceUrl": "http://hyperplane-service-89fc99.hyperplane-pipelines.svc.cluster.local:8787",
+        "readme": "",
+        "isOutputNode": false
+      }
+    },
+    {
+      "id": "agent_1745420716020",
+      "type": "agent",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Main",
+        "originalId": "agent_1745420716020",
+        "prompt": "# Step 1 - Conduct Research on Latest SEC Documents for Dynex\n\nProduce a comprehensive report detailing the most recent filings from Dynex as reported by the Securities and Exchange Commission (SEC). Focus on:\n- The latest quarterly or annual reports (Form 10-Q and Form 10-K)\n- Any significant event reports (Form 8-K) that have been filed recently\n- Recent insider trading activities related to Dynex\n\nUse @agent-webresearcher to conduct research online. Provide it with specific topics and research requests focusing on SEC filings for Dynex. Do as many follow-up requests as needed to construct the report.\nImportant guidance:\n- Make sure to ask @agent-webresearcher to return the links to its sources, not just the research\n- Always include source links with every section in your report\n- The research should cover documents filed within the last month for a thorough update\n\n# Step 2 - Send Research Report by Email to yijie@shakudo.io\n\nUse the following code to send the compiled report via email to Yijie Ding at Shakudo. Ensure that all relevant details are included in the request sent to the n8n endpoint.\n```python\nimport requests\nfrom datetime import datetime, timedelta\n\ndef fetch_recent_dates(days_back=30):\n    end_date = datetime.now().date()\n    start_date = end_date - timedelta(days=days_back)\n    return {'start_date': str(start_date), 'end_date': str(end_date)}\n\ndef send_request(service, data):\n    url = \"https://n8n-v1.dev.hyperplane.dev/webhook/e6684397-2018-4213-86e0-44dc78f8b951\"\n    headers = {\"Content-Type\": \"application/json\"}\n    response = requests.post(url, headers=headers, json=data)\n    return response.json()\n\ndef email_request(request):\n    data = {\"service\": \"gmail\", \"request\": request}\n    return send_request(service=\"gmail\", data=data)\n\n# Example of how to compile and send the research report\nresearch_report = \"Include detailed summary of Dynex's recent SEC filings here.\"\ndates_range = fetch_recent_dates()\n\nemail_request({\n    'subject': f'Dynex Latest SEC Filings Report for {dates_range[\"start_date\"]} - {dates_range[\"end_date\"]}',\n    'to_email': 'yijie@shakudo.io',\n    'body': research_report,\n})\n```",
+        "displayDescription": "Researches and compiles Dynex SEC filings for detailed reports.",
+        "displayEmoji": "📊",
+        "maxSteps": 10,
+        "isOutputNode": false,
+        "useBaseTools": false,
+        "agentType": "CodeAgent"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "agent_1745420716020",
+      "sourceHandle": "bottom",
+      "target": "tool_89fc99d5_b85b_423b_aad9_b372a734b62e",
+      "targetHandle": null,
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed"
+      },
+      "id": "reactflow__edge-agent-1745420716020bottom-tool-89fc99d5-b85b-423b-aad9-b372a734b62e",
+      "originalSource": "agent_1745420716020",
+      "originalTarget": "tool-89fc99d5-b85b-423b-aad9-b372a734b62e"
+    }
+  ]
+}

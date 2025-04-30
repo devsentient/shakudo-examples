@@ -1,0 +1,25 @@
+[project]
+name = "dynexnewdocsreport"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp>=3.11.18",
+    "fastapi>=0.103.0",
+    "fastapi-mcp==0.2.0",
+    "litellm>=1.60.2",
+    "nest-asyncio>=1.6.0",
+    "openinference-instrumentation-smolagents>=0.1.10",
+    "opentelemetry-api>=1.32.1",
+    "opentelemetry-instrumentation>=0.53b1",
+    "opentelemetry-instrumentation-fastapi>=0.53b1",
+    "opentelemetry-sdk>=1.32.1",
+    "opentelemetry-semantic-conventions>=0.53b1",
+    "psutil>=7.0.0",
+    "psycopg2-binary>=2.9.10",
+    "pydantic>=2.11.3",
+    "requests>=2.28.0",
+    "smolagents[litellm,mcp]==1.14.0",
+    "uvicorn[standard]>=0.30.0",
+]

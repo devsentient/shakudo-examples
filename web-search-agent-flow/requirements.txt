@@ -1,0 +1,26 @@
+fastapi>=0.103.0
+# Explicitly include all uvicorn components
+uvicorn>=0.30.0
+uvicorn[standard]>=0.30.0
+aiohttp
+pydantic
+# Use litellm version compatible with smolagents[litellm]==1.12.0
+litellm>=1.60.2
+# Pin smolagents to a version that includes memory module properly
+# Include both litellm and mcp extras in a single installation to ensure version consistency
+smolagents[litellm,mcp]==1.14.0
+fastapi-mcp==0.2.0
+# Ensure requests is installed for direct HTTP calls to LiteLLM proxy
+requests>=2.28.0
+# Install mcpadapt for better command-line MCP server support
+nest_asyncio
+psycopg2-binary
+# Pin specific versions of opentelemetry packages to ensure compatibility
+opentelemetry-sdk
+opentelemetry-api
+opentelemetry-semantic-conventions
+openinference-instrumentation-smolagents
+# Add opentelemetry instrumentation libraries needed by the service
+opentelemetry-instrumentation
+opentelemetry-instrumentation-fastapi
+psutil
