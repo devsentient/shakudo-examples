@@ -1,0 +1,31 @@
+version: 1
+default_environment: dev
+project_id: 3d8e7c82-341f-4d25-b28b-a17fd9cd6877
+environments:
+- name: dev
+- name: staging
+- name: prod
+plugins:
+  extractors:
+  - name: tap-postgres
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-postgres.git
+    config:
+      host: supabase-metaflow-postgresql.hyperplane-supabase-metaflow
+      port: 5432
+      user: supabase_admin
+      database: postgres
+    select:
+    - public-wikihow.*
+  loaders:
+  - name: target-snowflake
+    variant: meltanolabs
+    pip_url: meltanolabs-target-snowflake
+    config:
+      account: thzolzt-uj89392
+      add_record_metadata: true
+      database: MELTANO_DEMO
+      user: MELTANO_USER
+      role: MELTANO_ROLE
+      warehouse: MELTANO_WAREHOUSE
+      default_target_schema: ${MELTANO_EXTRACT__LOAD_SCHEMA}
