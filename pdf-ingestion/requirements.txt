@@ -1,0 +1,18 @@
+fastapi==0.115.6
+langchain==0.3.19
+langchain-core==0.3.40
+langchain-experimental==0.3.4
+langchain-openai==0.3.1
+langchain-text-splitters==0.3.6
+neo4j==5.27.0
+uvicorn==0.34.0
+pdfplumber==0.11.5
+# psycopg[pool]==3.1.17
+sse-starlette==1.8.2
+langsmith==0.2.11
+# psycopg2==2.9.9
+text_generation==0.6.1
+sqlalchemy==2.0.37
+python-dotenv==1.0.1
+minio==7.2.15
+colorlog==6.9.0
