@@ -54,6 +54,7 @@ async def recommend_tables(userprompt, schema):
     parsed = await get_db(LANGUAGE).get_tables(schema)
     
     excluded_tables = ", ".join(os.getenv('EXCLUDE_TABLE_NAMES', '').split(','))
+    print(parsed)
     prompt_table = TEMPLATE_TABLE_FINDING.format(
         table_example=str(parsed), prompt=userprompt, excluded_tables=excluded_tables
     )

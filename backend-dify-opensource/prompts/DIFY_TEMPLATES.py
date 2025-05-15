@@ -13,7 +13,6 @@ Give me the relevant tables to this prompt: "{prompt}"
 Your return should be exactly in format below, nothing else:
 {{"data": "table_1, table_2, table_3"}}
 
-Exclude the following table(s) from your answer: [{excluded_tables}]
 """
 
 TEMPLATE = """
