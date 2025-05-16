@@ -52,9 +52,14 @@ async def recommend_tables(userprompt, schema):
     It generates the prompt dynamically and return it.
     """
     parsed = await get_db(LANGUAGE).get_tables(schema)
+    
+    excluded_tables = os.getenv('EXCLUDE_TABLE_NAMES', '').split(',')
+    for tname in excluded_tables:
+        parsed.pop(tname, None)
+    print(f"Tables considered: {parsed.keys()}")
 
     prompt_table = TEMPLATE_TABLE_FINDING.format(
-        table_example=str(parsed), prompt=userprompt
+        table_example=str(parsed), prompt=userprompt, excluded_tables=excluded_tables
     )
     return prompt_table
 
