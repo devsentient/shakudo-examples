@@ -13,8 +13,8 @@ proxy_prefix = '/hyperhub-elliott-40shakudo-io-basic-0ffdd3/code/proxy/8050/'
 # )
 
 pathname_params = dict()
-pathname_params["routes_pathname_prefix"] = "/"                                                                                                                                                                                                                              
-pathname_params["requests_pathname_prefix"] = "/hyperhub-elliott-40shakudo-io-basic-0ffdd3/code/proxy/8050/"                                                                                                                                                                                  
+# pathname_params["routes_pathname_prefix"] = "/"                                                                                                                                                                                                                              
+# pathname_params["requests_pathname_prefix"] = "/hyperhub-elliott-40shakudo-io-basic-0ffdd3/code/proxy/8050/"                                                                                                                                                                                  
 app = Dash(__name__,  **pathname_params)
 
 
