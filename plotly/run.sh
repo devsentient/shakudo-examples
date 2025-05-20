@@ -1,2 +1,2 @@
 pip install -r requirements.txt
-python mini-plot-server.py
+python plotly/mini-plot-server.py
