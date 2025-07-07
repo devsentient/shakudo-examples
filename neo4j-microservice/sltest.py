@@ -7,7 +7,7 @@ from neo4j import GraphDatabase
 # --- CONFIG ---
 NEO4J_URI = "bolt://neo4j.hyperplane-neo4j.svc.cluster.local:7687"  # Change if needed
 NEO4J_USER = "neo4j"
-NEO4J_PASSWORD = "your_password_here"
+NEO4J_PASSWORD = "Shakudo312!"
 
 # --- CONNECTOR ---
 @st.cache_resource
