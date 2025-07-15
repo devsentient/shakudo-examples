@@ -1,0 +1,206 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "O365 Group Action",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Select Action",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "List Users"
+                  },
+                  {
+                    "option": "Add User"
+                  },
+                  {
+                    "option": "Remove User"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        320,
+        440
+      ],
+      "id": "cd1c425f-2acb-48b4-9f00-a0fdfc5f5fbc",
+      "name": "On form submission",
+      "webhookId": "6c0a5103-c8a9-4cc0-980b-a3d032336a3b"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json[\"Select Action\"] }}",
+                    "rightValue": "List Users",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a8f225c0-9ce4-4d92-b419-57555ef85f34"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "dc481d41-57c3-4079-89a0-0ef89e805df5",
+                    "leftValue": "={{ $json[\"Select Action\"] }}",
+                    "rightValue": "Add User",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7e9df724-d54c-4122-8abe-a1ca93c39095",
+                    "leftValue": "={{ $json[\"Select Action\"] }}",
+                    "rightValue": "Remove User",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        540,
+        440
+      ],
+      "id": "7949f94c-6ac2-44ce-bac8-1047bbd7ee55",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.microsoft.com/v1.0/users",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        220
+      ],
+      "id": "1e5573b5-90cb-483e-bec5-a47371d729bd",
+      "name": "GET User1",
+      "credentials": {
+        "microsoftOAuth2Api": {
+          "id": "6x9VB7J7A2YOKk0H",
+          "name": "Microsoft [CLOUDHQ TASK]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq true and mailEnabled eq true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        580
+      ],
+      "id": "dbe1458f-22e7-4360-abcf-066815477999",
+      "name": "List Mail-enabled Security Groups",
+      "credentials": {
+        "microsoftOAuth2Api": {
+          "id": "6x9VB7J7A2YOKk0H",
+          "name": "Microsoft [CLOUDHQ TASK]"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "GET User1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "List Mail-enabled Security Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cc2ebcab3730b74928cd26e6e6d7edc0a37301ed83ca386e372268eab8db3b3f"
+  }
+}
