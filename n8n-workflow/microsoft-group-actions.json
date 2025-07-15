@@ -123,28 +123,6 @@
     },
     {
       "parameters": {
-        "url": "=https://graph.microsoft.com/v1.0/users",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "microsoftOAuth2Api",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        840,
-        220
-      ],
-      "id": "1e5573b5-90cb-483e-bec5-a47371d729bd",
-      "name": "GET User1",
-      "credentials": {
-        "microsoftOAuth2Api": {
-          "id": "6x9VB7J7A2YOKk0H",
-          "name": "Microsoft [CLOUDHQ TASK]"
-        }
-      }
-    },
-    {
-      "parameters": {
         "url": "=https://graph.microsoft.com/v1.0/groups?$filter=securityEnabled eq true and mailEnabled eq true",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "microsoftOAuth2Api",
@@ -153,8 +131,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        840,
-        580
+        820,
+        680
       ],
       "id": "dbe1458f-22e7-4360-abcf-066815477999",
       "name": "List Mail-enabled Security Groups",
@@ -164,6 +142,103 @@
           "name": "Microsoft [CLOUDHQ TASK]"
         }
       }
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.microsoft.com/v1.0/users",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        820,
+        440
+      ],
+      "id": "913868de-c85a-4d20-8671-1aba2dad9de3",
+      "name": "List Users",
+      "credentials": {
+        "microsoftOAuth2Api": {
+          "id": "6x9VB7J7A2YOKk0H",
+          "name": "Microsoft [CLOUDHQ TASK]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$node[\"On form submission\"].json[\"Select Action\"]}}",
+                    "rightValue": "List Users",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7bf1eed1-13d2-40a6-ae31-faf068f56728"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "edb39c4a-50ad-4755-81c0-b14d27c45997",
+                    "leftValue": "={{$node[\"On form submission\"].json[\"Select Action\"]}}",
+                    "rightValue": "Add User",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1080,
+        440
+      ],
+      "id": "17582b3f-0529-4a69-8535-043744a57af3",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1340,
+        280
+      ],
+      "id": "bec10506-dd9b-43a6-860c-118fec1f8b48",
+      "name": "Return List Users"
     }
   ],
   "connections": {
@@ -182,15 +257,43 @@
       "main": [
         [
           {
-            "node": "GET User1",
+            "node": "List Users",
             "type": "main",
             "index": 0
           }
         ],
-        [],
+        [
+          {
+            "node": "List Users",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "List Mail-enabled Security Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Users": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Return List Users",
             "type": "main",
             "index": 0
           }
