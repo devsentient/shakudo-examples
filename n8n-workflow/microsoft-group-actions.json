@@ -132,7 +132,7 @@
       "typeVersion": 4.2,
       "position": [
         820,
-        680
+        800
       ],
       "id": "dbe1458f-22e7-4360-abcf-066815477999",
       "name": "List Mail-enabled Security Groups",
@@ -179,7 +179,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{$node[\"On form submission\"].json[\"Select Action\"]}}",
+                    "leftValue": "={{ $json.onFormSubmission }}",
                     "rightValue": "List Users",
                     "operator": {
                       "type": "string",
@@ -202,7 +202,7 @@
                 "conditions": [
                   {
                     "id": "edb39c4a-50ad-4755-81c0-b14d27c45997",
-                    "leftValue": "={{$node[\"On form submission\"].json[\"Select Action\"]}}",
+                    "leftValue": "={{ $json.onFormSubmission }}",
                     "rightValue": "Add User",
                     "operator": {
                       "type": "string",
@@ -216,12 +216,14 @@
             }
           ]
         },
-        "options": {}
+        "options": {
+          "allMatchingOutputs": false
+        }
       },
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        1080,
+        1400,
         440
       ],
       "id": "17582b3f-0529-4a69-8535-043744a57af3",
@@ -229,16 +231,151 @@
     },
     {
       "parameters": {
+        "resume": "form",
+        "formTitle": "Users",
+        "formDescription": "=",
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "html",
+              "elementName": "Users",
+              "html": "<!-- Your custom HTML here --->\n{{ $json.userHtml }}\n\n"
+            },
+            {
+              "fieldLabel": "Select a User",
+              "placeholder": "Type a user’s email",
+              "requiredField": true
+            },
+            {
+              "fieldType": "hiddenField",
+              "fieldName": "=data",
+              "fieldValue": "={{ JSON.stringify($json.data) }}"
+            }
+          ]
+        },
         "options": {}
       },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.4,
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
       "position": [
-        1340,
-        280
+        1880,
+        600
       ],
-      "id": "bec10506-dd9b-43a6-860c-118fec1f8b48",
-      "name": "Return List Users"
+      "id": "2d2cf885-6908-4f31-8add-d6debd39ba1d",
+      "name": "Wait4",
+      "webhookId": "04c810e8-43b5-4223-aaf2-4fec197651f8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json.data\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of data) {\n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${user.email || \"—\"}</p>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: data} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1640,
+        600
+      ],
+      "id": "f2e9ca3f-df3e-4926-892c-3c739a6d37dc",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the user list array from the 'List Users' node\nconst userList = $node[\"List Users\"].json[\"value\"];\n\n// Extract the emails from the user list (some users might not have mail)\nconst validEmails = userList\n  .map(user => user.mail)\n  .filter(email => email && email.trim() !== \"\");\n\n// Get the email submitted in the current input\nconst selectedEmail = $json[\"Select a User\"];\n\n// Check if the selected email exists in the valid emails list\nif (!validEmails.includes(selectedEmail)) {\n  // Exit early: return nothing, which drops the item in n8n\n  return [\n    {\n      json: {\n        email: selectedEmail,\n        error: `User email '${selectedEmail}' does not exist.`,\n        data: $input.first().json.data\n      }\n    }\n  ];\n}\n\n// If email exists, return the item (continue workflow)\nreturn [\n    {\n      json: {\n        email: validEmails[0],\n        data: $input.first().json.data\n      }\n    }\n  ];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2140,
+        600
+      ],
+      "id": "34fe90df-73b2-4113-b881-3f94afc327fa",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Error",
+        "formDescription": "=Provided user email \"{{ $json.email }}\"\" is not valid ",
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "hiddenField",
+              "fieldName": "data",
+              "fieldValue": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2620,
+        360
+      ],
+      "id": "c66b083e-fc55-426e-95bd-b597f449bd36",
+      "name": "Wait",
+      "webhookId": "c476a4cd-30c4-44fc-ade7-b0d4841f9bab"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e3ea6b32-225f-49a0-a2bf-bbaec131c951",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2420,
+        600
+      ],
+      "id": "56c97b51-ea3a-499f-a225-1403123e2d50",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const users = $input.first().json.value\nconst onFormSubmission = $node[\"On form submission\"].json[\"Select Action\"];\n\nif (!Array.isArray(users)) {\n  throw new Error(\"Expected 'value' to be an array.\");\n}\n\nconst simplifiedUsers = users.map(user => {\n  return {\n    displayName: user.displayName || \"—\",\n    email: user.mail || \"—\"\n  };\n});\n\nreturn [{ json: { data: simplifiedUsers, onFormSubmission: onFormSubmission} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        440
+      ],
+      "id": "ee933ddc-2211-4770-a198-acd3fe145a3d",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const jsonString = $input.first().json.data;\n\nlet parsedData;\n\ntry {\n  parsedData = JSON.parse(jsonString);\n\n  // Handle double-encoded strings\n  if (typeof parsedData === 'string') {\n    parsedData = JSON.parse(parsedData);\n  }\n\n  if (!Array.isArray(parsedData)) {\n    throw new Error(\"Parsed data is not an array\");\n  }\n\n} catch (error) {\n  throw new Error(\"Invalid JSON string in 'data': \" + error.message);\n}\n\n// Wrap the array inside a single object\nreturn [\n  {\n    json: {\n      data: parsedData\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2360,
+        -20
+      ],
+      "id": "3fb9004c-ef37-4003-9735-a5728d752399",
+      "name": "Code3"
     }
   ],
   "connections": {
@@ -278,7 +415,90 @@
         ]
       ]
     },
+    "List Mail-enabled Security Groups": {
+      "main": [
+        []
+      ]
+    },
     "List Users": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
       "main": [
         [
           {
@@ -289,11 +509,11 @@
         ]
       ]
     },
-    "Switch1": {
+    "Code3": {
       "main": [
         [
           {
-            "node": "Return List Users",
+            "node": "Code",
             "type": "main",
             "index": 0
           }
