@@ -11,7 +11,7 @@
       "typeVersion": 4.2,
       "position": [
         -1180,
-        880
+        980
       ],
       "id": "4a74eeed-cf58-4f4a-9826-e6f7b6b667d1",
       "name": "List Mail-enabled Security Groups",
@@ -32,8 +32,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -740,
-        680
+        -1180,
+        630
       ],
       "id": "818d80ed-7bde-4d15-83c6-5c398fd276c6",
       "name": "List Users1",
@@ -54,8 +54,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        -300,
-        780
+        -740,
+        730
       ],
       "id": "44f7ca15-4001-4a79-bc44-cdc4f067795d",
       "name": "Merge"
@@ -90,7 +90,7 @@
       "typeVersion": 2.2,
       "position": [
         -1400,
-        780
+        880
       ],
       "id": "54177d06-9355-4b6c-a7a1-a72bd44d93c5",
       "name": "On form submission1",
@@ -103,48 +103,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -520,
-        680
+        -960,
+        630
       ],
       "id": "11f5fd96-b376-4df6-92bd-a2ecd01574a0",
       "name": "Code3"
-    },
-    {
-      "parameters": {
-        "jsCode": "const members = items[0].json.value;\nreturn members.map(member => ({ json: member }));"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -740,
-        880
-      ],
-      "id": "5c6658dc-13d4-46fa-b622-59f6555b1279",
-      "name": "Code4"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "1ae92051-c501-487a-a45c-66130017dccc",
-              "name": "groupMember",
-              "value": true,
-              "type": "boolean"
-            }
-          ]
-        },
-        "includeOtherFields": true,
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -520,
-        880
-      ],
-      "id": "188ec5d1-3bd4-4470-8b66-162b8c1a4a2b",
-      "name": "Edit Fields"
     },
     {
       "parameters": {
@@ -225,8 +188,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        -80,
-        780
+        -520,
+        730
       ],
       "id": "019e5501-1566-4766-8651-3158c1fc21a5",
       "name": "Switch2"
@@ -250,7 +213,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        360,
+        -80,
         580
       ],
       "id": "a50f2dfa-11f2-4b72-9c08-5608fa73a2b3",
@@ -264,7 +227,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        140,
+        -300,
         580
       ],
       "id": "e74e410e-598f-4e9c-8597-8949b771aba6",
@@ -272,12 +235,12 @@
     },
     {
       "parameters": {
-        "jsCode": "const data = items.map(item => item.json);\n\n// Filter only users who are NOT group members (missing or false)\nconst nonMembers = data.filter(user => user.groupMember !== true);\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n      position: relative;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .non-member-badge {\n      position: absolute;\n      top: 12px;\n      right: 12px;\n      background-color: #dc3545;\n      color: white;\n      padding: 2px 8px;\n      font-size: 12px;\n      border-radius: 4px;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of nonMembers) {\n  const email = user.mail || user.userPrincipalName || \"—\";\n\n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${email}</p>\n      <div class=\"non-member-badge\">Not in Group</div>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: nonMembers } }];\n"
+        "jsCode": "const data = items.map(item => item.json);\n\n// Filter only users who are NOT group members (missing or false)\nconst nonMembers = data.filter(user => user.groupId == null);\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n      position: relative;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .non-member-badge {\n      position: absolute;\n      top: 12px;\n      right: 12px;\n      background-color: #dc3545;\n      color: white;\n      padding: 2px 8px;\n      font-size: 12px;\n      border-radius: 4px;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of nonMembers) {\n  const email = user.mail || user.userPrincipalName || \"—\";\n\n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${email}</p>\n      <div class=\"non-member-badge\">Not in Group</div>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: nonMembers } }];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        140,
+        -300,
         780
       ],
       "id": "6f64a51c-7c87-4694-bd6d-eb0d97be830f",
@@ -285,12 +248,12 @@
     },
     {
       "parameters": {
-        "jsCode": "const data = items.map(item => item.json);\n\n// Filter only users with groupMember: true\nconst members = data.filter(user => user.groupMember === true);\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n      position: relative;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .group-badge {\n      position: absolute;\n      top: 12px;\n      right: 12px;\n      background-color: #28a745;\n      color: white;\n      padding: 2px 8px;\n      font-size: 12px;\n      border-radius: 4px;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of members) {\n  const email = user.mail || user.userPrincipalName || \"—\";\n  const isMember = user.groupMember === true;\n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${email}</p>\n      <p><strong>Group Member:</strong> ${isMember}</p>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: members } }];\n"
+        "jsCode": "const data = items.map(item => item.json);\n\n// Filter only users with groupMember: true\nconst members = data.filter(user => user.groupId != null);\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n      position: relative;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .group-badge {\n      position: absolute;\n      top: 12px;\n      right: 12px;\n      background-color: #28a745;\n      color: white;\n      padding: 2px 8px;\n      font-size: 12px;\n      border-radius: 4px;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of members) {\n  const email = user.mail || user.userPrincipalName || \"—\";\n  const groupName = user.groupDisplayName || \"-\";\n  \n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${email}</p>\n      <p><strong>Group Name:</strong> ${groupName}</p>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: members } }];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        140,
+        -300,
         980
       ],
       "id": "3ee5578b-e23f-447f-a881-64f2a420dfbe",
@@ -325,7 +288,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        360,
+        -80,
         780
       ],
       "id": "acbf962e-1dde-47be-8ce0-0060e0940a12",
@@ -361,7 +324,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        360,
+        -80,
         980
       ],
       "id": "738df287-ce73-4371-af72-dc8baf57e646",
@@ -378,8 +341,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -960,
-        880
+        -740,
+        930
       ],
       "id": "96a0b027-6fcb-4212-9e7a-669464311a42",
       "name": "List Group Users",
@@ -389,6 +352,32 @@
           "name": "Microsoft [CLOUDHQ TASK]"
         }
       }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -960,
+        980
+      ],
+      "id": "67ec28b5-d17c-4c17-8cb4-e1b78bef3f51",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "const members = items[0].json.value;\n\n// Assuming groupInfo is a **single group object**, not an array\nconst groupInfo = $node[\"List Mail-enabled Security Groups\"].json.value[0];\n\n// Add groupId and groupDisplayName to each member\nreturn members.map(member => ({\n  json: {\n    ...member,\n    groupId: groupInfo.id,\n    groupDisplayName: groupInfo.displayName,\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        1055
+      ],
+      "id": "01c2cd25-cdda-4b55-af03-9dbe06eba57f",
+      "name": "Code"
     }
   ],
   "connections": {
@@ -396,7 +385,7 @@
       "main": [
         [
           {
-            "node": "List Group Users",
+            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
@@ -448,28 +437,6 @@
             "node": "Merge",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Code4": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 1
           }
         ]
       ]
@@ -536,7 +503,36 @@
       "main": [
         [
           {
-            "node": "Code4",
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "List Group Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
