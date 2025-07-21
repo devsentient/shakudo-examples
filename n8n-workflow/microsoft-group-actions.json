@@ -24,28 +24,6 @@
     },
     {
       "parameters": {
-        "url": "=https://graph.microsoft.com/v1.0/users",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "microsoftOAuth2Api",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        -1180,
-        630
-      ],
-      "id": "818d80ed-7bde-4d15-83c6-5c398fd276c6",
-      "name": "List Users1",
-      "credentials": {
-        "microsoftOAuth2Api": {
-          "id": "6x9VB7J7A2YOKk0H",
-          "name": "Microsoft [CLOUDHQ TASK]"
-        }
-      }
-    },
-    {
-      "parameters": {
         "mode": "combine",
         "fieldsToMatchString": "id",
         "joinMode": "enrichInput1",
@@ -59,6 +37,350 @@
       ],
       "id": "44f7ca15-4001-4a79-bc44-cdc4f067795d",
       "name": "Merge"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.microsoft.com/v1.0/groups/{{ $json.value[0].id }}/members\n",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -740,
+        930
+      ],
+      "id": "96a0b027-6fcb-4212-9e7a-669464311a42",
+      "name": "List Group Users",
+      "credentials": {
+        "microsoftOAuth2Api": {
+          "id": "6x9VB7J7A2YOKk0H",
+          "name": "Microsoft [CLOUDHQ TASK]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const members = items[0].json.value;\nreturn members.map(member => ({ json: member }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        630
+      ],
+      "id": "11f5fd96-b376-4df6-92bd-a2ecd01574a0",
+      "name": "Flat Users Res"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -960,
+        980
+      ],
+      "id": "67ec28b5-d17c-4c17-8cb4-e1b78bef3f51",
+      "name": "Loop Over Groups"
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.microsoft.com/v1.0/users",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1180,
+        630
+      ],
+      "id": "818d80ed-7bde-4d15-83c6-5c398fd276c6",
+      "name": "List Users",
+      "credentials": {
+        "microsoftOAuth2Api": {
+          "id": "6x9VB7J7A2YOKk0H",
+          "name": "Microsoft [CLOUDHQ TASK]"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const members = items[0].json.value;\n\n// Assuming groupInfo is a **single group object**, not an array\nconst groupInfo = $node[\"List Mail-enabled Security Groups\"].json.value[0];\n\n// Add groupId and groupDisplayName to each member\nreturn members.map(member => ({\n  json: {\n    ...member,\n    groupId: groupInfo.id,\n    groupDisplayName: groupInfo.displayName,\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -520,
+        1055
+      ],
+      "id": "01c2cd25-cdda-4b55-af03-9dbe06eba57f",
+      "name": "Merge User-Group Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('User Actions Form').item.json[\"Select Action\"] }}",
+                    "rightValue": "List Users",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a8f225c0-9ce4-4d92-b419-57555ef85f34"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "dc481d41-57c3-4079-89a0-0ef89e805df5",
+                    "leftValue": "={{ $('User Actions Form').item.json[\"Select Action\"] }}",
+                    "rightValue": "Add User",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "7e9df724-d54c-4122-8abe-a1ca93c39095",
+                    "leftValue": "={{ $('User Actions Form').item.json[\"Select Action\"] }}",
+                    "rightValue": "Remove User",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -520,
+        730
+      ],
+      "id": "019e5501-1566-4766-8651-3158c1fc21a5",
+      "name": "User Action Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = items.map(item => item.json);\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n      position: relative;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .group-badge {\n      position: absolute;\n      top: 12px;\n      right: 12px;\n      background-color: #28a745;\n      color: white;\n      padding: 2px 8px;\n      font-size: 12px;\n      border-radius: 4px;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of data) {\n  const email = user.mail || user.userPrincipalName || \"—\";\n  const isMember = !!user.groupDisplayName;\n\n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${email}</p>\n      <p><strong>Group Member:</strong> ${isMember}</p>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: data } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -300,
+        780
+      ],
+      "id": "6f64a51c-7c87-4694-bd6d-eb0d97be830f",
+      "name": "Add Users HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = items.map(item => item.json);\n\n// Filter only users with groupMember: true\nconst members = data.filter(user => user.groupId != null);\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n      position: relative;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .group-badge {\n      position: absolute;\n      top: 12px;\n      right: 12px;\n      background-color: #28a745;\n      color: white;\n      padding: 2px 8px;\n      font-size: 12px;\n      border-radius: 4px;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of members) {\n  const email = user.mail || user.userPrincipalName || \"—\";\n  const groupName = user.groupDisplayName || \"-\";\n  \n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${email}</p>\n      <p><strong>Group Name:</strong> ${groupName}</p>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: members } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -300,
+        980
+      ],
+      "id": "3ee5578b-e23f-447f-a881-64f2a420dfbe",
+      "name": "Remove Users HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = items.map(item => item.json);\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n      position: relative;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .group-badge {\n      position: absolute;\n      top: 12px;\n      right: 12px;\n      background-color: #28a745;\n      color: white;\n      padding: 2px 8px;\n      font-size: 12px;\n      border-radius: 4px;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of data) {\n  const email = user.mail || user.userPrincipalName || \"—\";\n  const isMember = !!user.groupDisplayName;\n\n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${email}</p>\n      <p><strong>Group Member:</strong> ${isMember}</p>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: data } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -300,
+        580
+      ],
+      "id": "e74e410e-598f-4e9c-8597-8949b771aba6",
+      "name": "List Users HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "const groups = $('List Mail-enabled Security Groups').first().json.value;\n\nlet html = `\n  <style>\n    .group-card {\n      border: 1px solid #000;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 12px;\n      background-color: #f1f1f1;\n      font-family: sans-serif;\n      position: relative;\n    }\n    .group-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #000;\n    }\n    .group-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #333;\n    }\n    .group-container {\n      max-width: 600px;\n      margin: auto;\n    }\n    hr {\n      border: none;\n      height: 1px;\n      background-color: black;\n      margin: 16px 0;\n    }\n  </style>\n\n  <div class=\"group-container\">\n`;\n\nfor (const group of groups) {\n  html += `\n    <div class=\"group-card\">\n      <h3>${group.displayName || \"—\"}</h3>\n      <p><strong>Description:</strong> ${group.description || \"—\"}</p>\n    </div>\n    <hr />\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { groupHtml: html, data: groups } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        140,
+        780
+      ],
+      "id": "fe4a6d05-a4fb-440a-9aca-5d36d61cf495",
+      "name": "Add to Group HTML"
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Users",
+        "formDescription": "=",
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "html",
+              "elementName": "Users",
+              "html": "<!-- Your custom HTML here --->\n{{ $json.userHtml }}\n\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        580
+      ],
+      "id": "a50f2dfa-11f2-4b72-9c08-5608fa73a2b3",
+      "name": "List Users Form",
+      "webhookId": "04c810e8-43b5-4223-aaf2-4fec197651f8"
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Users",
+        "formDescription": "=",
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "html",
+              "elementName": "Users",
+              "html": "<!-- Your custom HTML here --->\n{{ $json.userHtml }}\n\n"
+            },
+            {
+              "fieldLabel": "Select a User",
+              "placeholder": "Type a user’s email",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        780
+      ],
+      "id": "acbf962e-1dde-47be-8ce0-0060e0940a12",
+      "name": "Add Users Form",
+      "webhookId": "04c810e8-43b5-4223-aaf2-4fec197651f8"
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Users",
+        "formDescription": "=",
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "html",
+              "elementName": "Users",
+              "html": "<!-- Your custom HTML here --->\n{{ $json.userHtml }}\n\n"
+            },
+            {
+              "fieldLabel": "Select a User",
+              "placeholder": "Type a user’s email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Select a Group",
+              "placeholder": "Type a Group Name",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        980
+      ],
+      "id": "738df287-ce73-4371-af72-dc8baf57e646",
+      "name": "Remove Users Form",
+      "webhookId": "04c810e8-43b5-4223-aaf2-4fec197651f8"
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Users",
+        "formDescription": "=",
+        "formFields": {
+          "values": [
+            {
+              "fieldType": "html",
+              "elementName": "Groups",
+              "html": "<!-- Your custom HTML here --->\n{{ $json.groupHtml }}\n\n"
+            },
+            {
+              "fieldLabel": "Select a Group Name",
+              "placeholder": "Type a group name",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        360,
+        780
+      ],
+      "id": "3ad4b0ce-f4e5-4bfd-97a1-8a334b623bd7",
+      "name": "Add to Group Form",
+      "webhookId": "04c810e8-43b5-4223-aaf2-4fec197651f8"
     },
     {
       "parameters": {
@@ -93,259 +415,60 @@
         880
       ],
       "id": "54177d06-9355-4b6c-a7a1-a72bd44d93c5",
-      "name": "On form submission1",
+      "name": "User Actions Form",
       "webhookId": "8f61ce4b-c8d8-497f-93dc-81f46acc60ef"
     },
     {
       "parameters": {
-        "jsCode": "const members = items[0].json.value;\nreturn members.map(member => ({ json: member }));"
+        "jsCode": "const mailEnabledGroups = $('List Mail-enabled Security Groups').first().json.value;\nconst users = $('List Users').first().json.value;\nconst selectedUserEmail = $('Add Users Form').first().json[\"Select a User\"];\nconst selectedGroup = $input.first().json[\"Select a Group Name\"];\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\n// Find group ID by displayName\nconst group = mailEnabledGroups.find(g => g.displayName === selectedGroup);\nconst groupId = group ? group.id : null;\n\n// Find user ID by email or userPrincipalName\nconst user = users.find(u => u.mail === selectedUserEmail || u.userPrincipalName === selectedUserEmail);\nconst userId = user ? user.id : null;\n\n// Attach to all outputs\nconst output = $input.all().map(item => {\n  return {\n    json: {\n      resolvedGroupId: groupId,\n      resolvedUserId: userId,\n    }\n  };\n});\n\nreturn output;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -960,
-        630
-      ],
-      "id": "11f5fd96-b376-4df6-92bd-a2ecd01574a0",
-      "name": "Code3"
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $('On form submission1').item.json[\"Select Action\"] }}",
-                    "rightValue": "List Users",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    },
-                    "id": "a8f225c0-9ce4-4d92-b419-57555ef85f34"
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "dc481d41-57c3-4079-89a0-0ef89e805df5",
-                    "leftValue": "={{ $('On form submission1').item.json[\"Select Action\"] }}",
-                    "rightValue": "Add User",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "7e9df724-d54c-4122-8abe-a1ca93c39095",
-                    "leftValue": "={{ $('On form submission1').item.json[\"Select Action\"] }}",
-                    "rightValue": "Remove User",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.2,
-      "position": [
-        -520,
-        730
-      ],
-      "id": "019e5501-1566-4766-8651-3158c1fc21a5",
-      "name": "Switch2"
-    },
-    {
-      "parameters": {
-        "resume": "form",
-        "formTitle": "Users",
-        "formDescription": "=",
-        "formFields": {
-          "values": [
-            {
-              "fieldType": "html",
-              "elementName": "Users",
-              "html": "<!-- Your custom HTML here --->\n{{ $json.userHtml }}\n\n"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        -80,
-        580
-      ],
-      "id": "a50f2dfa-11f2-4b72-9c08-5608fa73a2b3",
-      "name": "Wait5",
-      "webhookId": "04c810e8-43b5-4223-aaf2-4fec197651f8"
-    },
-    {
-      "parameters": {
-        "jsCode": "const data = items.map(item => item.json);\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n      position: relative;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .group-badge {\n      position: absolute;\n      top: 12px;\n      right: 12px;\n      background-color: #28a745;\n      color: white;\n      padding: 2px 8px;\n      font-size: 12px;\n      border-radius: 4px;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of data) {\n  const email = user.mail || user.userPrincipalName || \"—\";\n  const isMember = user.groupMember === true;\n\n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${email}</p>\n      <p><strong>Group Member:</strong> ${isMember}</p>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: data } }];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -300,
-        580
-      ],
-      "id": "e74e410e-598f-4e9c-8597-8949b771aba6",
-      "name": "Code5"
-    },
-    {
-      "parameters": {
-        "jsCode": "const data = items.map(item => item.json);\n\n// Filter only users who are NOT group members (missing or false)\nconst nonMembers = data.filter(user => user.groupId == null);\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n      position: relative;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .non-member-badge {\n      position: absolute;\n      top: 12px;\n      right: 12px;\n      background-color: #dc3545;\n      color: white;\n      padding: 2px 8px;\n      font-size: 12px;\n      border-radius: 4px;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of nonMembers) {\n  const email = user.mail || user.userPrincipalName || \"—\";\n\n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${email}</p>\n      <div class=\"non-member-badge\">Not in Group</div>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: nonMembers } }];\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -300,
+        580,
         780
       ],
-      "id": "6f64a51c-7c87-4694-bd6d-eb0d97be830f",
-      "name": "Code6"
+      "id": "1c062576-4029-4233-ada8-48e5aa7227c4",
+      "name": "Find User and Group Id"
     },
     {
       "parameters": {
-        "jsCode": "const data = items.map(item => item.json);\n\n// Filter only users with groupMember: true\nconst members = data.filter(user => user.groupId != null);\n\nlet html = `\n  <style>\n    .user-card {\n      border: 1px solid #ccc;\n      border-radius: 6px;\n      padding: 12px;\n      margin-bottom: 0;\n      background-color: #f9f9f9;\n      font-family: sans-serif;\n      border-bottom: 2px solid #ddd;\n      position: relative;\n    }\n    .user-card:last-child {\n      border-bottom: none;\n      margin-bottom: 12px;\n    }\n    .user-card h3 {\n      margin: 0 0 6px 0;\n      font-size: 16px;\n      color: #333;\n    }\n    .user-card p {\n      margin: 4px 0;\n      font-size: 14px;\n      color: #555;\n    }\n    .group-badge {\n      position: absolute;\n      top: 12px;\n      right: 12px;\n      background-color: #28a745;\n      color: white;\n      padding: 2px 8px;\n      font-size: 12px;\n      border-radius: 4px;\n    }\n    .user-container {\n      max-width: 600px;\n      margin: auto;\n    }\n  </style>\n\n  <div class=\"user-container\">\n`;\n\nfor (const user of members) {\n  const email = user.mail || user.userPrincipalName || \"—\";\n  const groupName = user.groupDisplayName || \"-\";\n  \n  html += `\n    <div class=\"user-card\">\n      <h3>${user.displayName || \"—\"}</h3>\n      <p><strong>Email:</strong> ${email}</p>\n      <p><strong>Group Name:</strong> ${groupName}</p>\n    </div>\n  `;\n}\n\nhtml += `</div>`;\n\nreturn [{ json: { userHtml: html, data: members } }];\n"
+        "jsCode": "const mailEnabledGroups = $('List Mail-enabled Security Groups').first().json.value;\nconst users = $('List Users').first().json.value;\nconst selectedUserEmail = $input.first().json[\"Select a User\"];\nconst selectedGroup = $input.first().json[\"Select a Group\"];\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\n// Find group ID by displayName\nconst group = mailEnabledGroups.find(g => g.displayName === selectedGroup);\nconst groupId = group ? group.id : null;\n\n// Find user ID by email or userPrincipalName\nconst user = users.find(u => u.mail === selectedUserEmail || u.userPrincipalName === selectedUserEmail);\nconst userId = user ? user.id : null;\n\n// Attach to all outputs\nconst output = $input.all().map(item => {\n  return {\n    json: {\n      resolvedGroupId: groupId,\n      resolvedUserId: userId,\n    }\n  };\n});\n\nreturn output;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -300,
+        140,
         980
       ],
-      "id": "3ee5578b-e23f-447f-a881-64f2a420dfbe",
-      "name": "Code7"
+      "id": "38ba3d70-c5cf-4f88-9c04-72b5e9825723",
+      "name": "Find User and Group Id 2"
     },
     {
       "parameters": {
-        "resume": "form",
-        "formTitle": "Users",
-        "formDescription": "=",
-        "formFields": {
-          "values": [
-            {
-              "fieldType": "html",
-              "elementName": "Users",
-              "html": "<!-- Your custom HTML here --->\n{{ $json.userHtml }}\n\n"
-            },
-            {
-              "fieldLabel": "Select a User",
-              "placeholder": "Type a user’s email",
-              "requiredField": true
-            },
-            {
-              "fieldType": "hiddenField",
-              "fieldName": "=data",
-              "fieldValue": "={{ JSON.stringify($json.data) }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        -80,
-        780
-      ],
-      "id": "acbf962e-1dde-47be-8ce0-0060e0940a12",
-      "name": "Wait6",
-      "webhookId": "04c810e8-43b5-4223-aaf2-4fec197651f8"
-    },
-    {
-      "parameters": {
-        "resume": "form",
-        "formTitle": "Users",
-        "formDescription": "=",
-        "formFields": {
-          "values": [
-            {
-              "fieldType": "html",
-              "elementName": "Users",
-              "html": "<!-- Your custom HTML here --->\n{{ $json.userHtml }}\n\n"
-            },
-            {
-              "fieldLabel": "Select a User",
-              "placeholder": "Type a user’s email",
-              "requiredField": true
-            },
-            {
-              "fieldType": "hiddenField",
-              "fieldName": "=data",
-              "fieldValue": "={{ JSON.stringify($json.data) }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        -80,
-        980
-      ],
-      "id": "738df287-ce73-4371-af72-dc8baf57e646",
-      "name": "Wait7",
-      "webhookId": "04c810e8-43b5-4223-aaf2-4fec197651f8"
-    },
-    {
-      "parameters": {
-        "url": "=https://graph.microsoft.com/v1.0/groups/{{ $json.value[0].id }}/members\n",
+        "method": "POST",
+        "url": "=https://graph.microsoft.com/v1.0/groups/{{$json.resolvedGroupId}}/members/$ref\n",
         "authentication": "predefinedCredentialType",
         "nodeCredentialType": "microsoftOAuth2Api",
-        "options": {}
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"@odata.id\": \"https://graph.microsoft.com/v1.0/directoryObjects/{{$json.resolvedUserId}}\"\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -740,
-        930
+        800,
+        780
       ],
-      "id": "96a0b027-6fcb-4212-9e7a-669464311a42",
-      "name": "List Group Users",
+      "id": "ac6bcd8e-d118-40d3-ab76-c21db233eee8",
+      "name": "Add User to Group",
       "credentials": {
         "microsoftOAuth2Api": {
           "id": "6x9VB7J7A2YOKk0H",
@@ -355,29 +478,92 @@
     },
     {
       "parameters": {
-        "options": {}
+        "method": "DELETE",
+        "url": "=https://graph.microsoft.com/v1.0/groups/{{ $json.resolvedGroupId }}/members/{{ $json.resolvedUserId }}/$ref\n",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "microsoftOAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
       },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
-        -960,
+        360,
         980
       ],
-      "id": "67ec28b5-d17c-4c17-8cb4-e1b78bef3f51",
-      "name": "Loop Over Items"
+      "id": "f7d7503d-867f-40ca-bc91-1e8855227226",
+      "name": "Remove User from Group",
+      "credentials": {
+        "microsoftOAuth2Api": {
+          "id": "6x9VB7J7A2YOKk0H",
+          "name": "Microsoft [CLOUDHQ TASK]"
+        }
+      }
     },
     {
       "parameters": {
-        "jsCode": "const members = items[0].json.value;\n\n// Assuming groupInfo is a **single group object**, not an array\nconst groupInfo = $node[\"List Mail-enabled Security Groups\"].json.value[0];\n\n// Add groupId and groupDisplayName to each member\nreturn members.map(member => ({\n  json: {\n    ...member,\n    groupId: groupInfo.id,\n    groupDisplayName: groupInfo.displayName,\n  }\n}));\n"
+        "jsCode": "const statusCode = $input.first().json.statusCode;\nconst user = $('Add Users Form').first().json[\"Select a User\"];\nconst group = $('Add to Group Form').first().json[\"Select a Group Name\"];\n\nlet html = `\n  <style>\n    .message-box {\n      max-width: 600px;\n      margin: 40px auto;\n      padding: 20px;\n      font-family: sans-serif;\n      border-radius: 8px;\n      font-size: 16px;\n      text-align: center;\n    }\n    .success {\n      background-color: #e6ffed;\n      color: #2e7d32;\n      border: 1px solid #b2dfdb;\n    }\n    .error {\n      background-color: #ffe6e6;\n      color: #c62828;\n      border: 1px solid #ffcdd2;\n    }\n  </style>\n`;\n\nif (statusCode === 204) {\n  html += `\n    <div class=\"message-box success\">\n      ✅ User: ${user} was successfully added to the group: ${group}.\n    </div>\n  `;\n} else {\n  html += `\n    <div class=\"message-box error\">\n      ❌ Failed to add the user. Status code: ${statusCode}\n    </div>\n  `;\n}\n\nreturn [\n  {\n    json: {\n      htmlMessage: html,\n      statusCode,\n    }\n  }\n];\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -520,
-        1055
+        1020,
+        780
       ],
-      "id": "01c2cd25-cdda-4b55-af03-9dbe06eba57f",
-      "name": "Code"
+      "id": "b310b80b-dc5f-4560-a8d8-9470f6051129",
+      "name": "Result"
+    },
+    {
+      "parameters": {
+        "jsCode": "const statusCode = $input.first().json.statusCode;\nconst user = $('Remove Users Form').first().json[\"Select a User\"];\nconst group = $('Remove Users Form').first().json[\"Select a Group\"];\n\nlet html = `\n  <style>\n    .message-box {\n      max-width: 600px;\n      margin: 40px auto;\n      padding: 20px;\n      font-family: sans-serif;\n      border-radius: 8px;\n      font-size: 16px;\n      text-align: center;\n    }\n    .success {\n      background-color: #e6ffed;\n      color: #2e7d32;\n      border: 1px solid #b2dfdb;\n    }\n    .error {\n      background-color: #ffe6e6;\n      color: #c62828;\n      border: 1px solid #ffcdd2;\n    }\n  </style>\n`;\n\nif (statusCode === 204) {\n  html += `\n    <div class=\"message-box success\">\n      ✅ User: ${user} was successfully removed from the group: ${group}.\n    </div>\n  `;\n} else {\n  html += `\n    <div class=\"message-box error\">\n      ❌ Failed to remove the user: ${user} from the group: ${group}. Status code: ${statusCode}\n    </div>\n  `;\n}\n\nreturn [\n  {\n    json: {\n      htmlMessage: html,\n      statusCode,\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        980
+      ],
+      "id": "6b809eed-65e8-47f7-8342-9b3ad5c584d4",
+      "name": "Result1"
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Response",
+        "formDescription": "=<!-- Your custom HTML here --->\n{{ $json.htmlMessage }}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        820,
+        980
+      ],
+      "id": "0faa7c2f-c8a4-44ba-bb87-536a276e9adb",
+      "name": "Remove Confirmation",
+      "webhookId": "7bbe2db6-6a09-4b13-8c40-9393bb1f8f37"
+    },
+    {
+      "parameters": {
+        "resume": "form",
+        "formTitle": "Response",
+        "formDescription": "=<!-- Your custom HTML here --->\n{{ $json.htmlMessage }}\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1240,
+        780
+      ],
+      "id": "bfc36532-9558-4cce-bb97-4e541f298688",
+      "name": "Add Confirmation",
+      "webhookId": "12e62106-7e4e-4ca3-b699-39f4a00f8e63"
     }
   ],
   "connections": {
@@ -385,18 +571,7 @@
       "main": [
         [
           {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "List Users1": {
-      "main": [
-        [
-          {
-            "node": "Code3",
+            "node": "Loop Over Groups",
             "type": "main",
             "index": 0
           }
@@ -407,92 +582,7 @@
       "main": [
         [
           {
-            "node": "Switch2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "On form submission1": {
-      "main": [
-        [
-          {
-            "node": "List Users1",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "List Mail-enabled Security Groups",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code3": {
-      "main": [
-        [
-          {
-            "node": "Merge",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Switch2": {
-      "main": [
-        [
-          {
-            "node": "Code5",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Code6",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Code7",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code5": {
-      "main": [
-        [
-          {
-            "node": "Wait5",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code6": {
-      "main": [
-        [
-          {
-            "node": "Wait6",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code7": {
-      "main": [
-        [
-          {
-            "node": "Wait7",
+            "node": "User Action Switch",
             "type": "main",
             "index": 0
           }
@@ -503,14 +593,25 @@
       "main": [
         [
           {
-            "node": "Code",
+            "node": "Merge User-Group Data",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Loop Over Items": {
+    "Flat Users Res": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Groups": {
       "main": [
         [
           {
@@ -528,11 +629,211 @@
         ]
       ]
     },
-    "Code": {
+    "List Users": {
       "main": [
         [
           {
-            "node": "Loop Over Items",
+            "node": "Flat Users Res",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge User-Group Data": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Action Switch": {
+      "main": [
+        [
+          {
+            "node": "List Users HTML",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add Users HTML",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Remove Users HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Users HTML": {
+      "main": [
+        [
+          {
+            "node": "Add Users Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Users HTML": {
+      "main": [
+        [
+          {
+            "node": "Remove Users Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Users HTML": {
+      "main": [
+        [
+          {
+            "node": "List Users Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Group HTML": {
+      "main": [
+        [
+          {
+            "node": "Add to Group Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Users Form": {
+      "main": [
+        []
+      ]
+    },
+    "Add Users Form": {
+      "main": [
+        [
+          {
+            "node": "Add to Group HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove Users Form": {
+      "main": [
+        [
+          {
+            "node": "Find User and Group Id 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Group Form": {
+      "main": [
+        [
+          {
+            "node": "Find User and Group Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Actions Form": {
+      "main": [
+        [
+          {
+            "node": "List Users",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "List Mail-enabled Security Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find User and Group Id": {
+      "main": [
+        [
+          {
+            "node": "Add User to Group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find User and Group Id 2": {
+      "main": [
+        [
+          {
+            "node": "Remove User from Group",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add User to Group": {
+      "main": [
+        [
+          {
+            "node": "Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove User from Group": {
+      "main": [
+        [
+          {
+            "node": "Result1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Result": {
+      "main": [
+        [
+          {
+            "node": "Add Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Result1": {
+      "main": [
+        [
+          {
+            "node": "Remove Confirmation",
             "type": "main",
             "index": 0
           }
