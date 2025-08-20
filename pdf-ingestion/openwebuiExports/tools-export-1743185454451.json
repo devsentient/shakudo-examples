@@ -1,0 +1,38 @@
+[
+    {
+        "id": "rag_tool",
+        "user_id": "d47c9c8e-9fd6-48e5-ac3d-0e44250b48ce",
+        "name": "RAG TOOL",
+        "content": "\"\"\"\ntitle: Query Graph Rag\nauthor: Shakudo\nauthor_url: https://github.com/shakudo\nversion: 0.1.0\n\"\"\"\n\nimport os\nimport requests\n\n\nclass Tools:\n    def __init__(self):\n        self.citation = True\n        self.microsvc = \"http://hyperplane-service-e85664.hyperplane-pipelines.svc.cluster.local:8787\"\n\n    async def query_dataset(self, user_query: str, __event_emitter__=None) -> str:\n        \"\"\"\n        Query with the user question, always use this function.\n        :param user_query: the query by the user.\n        \"\"\"\n        body = {\"query\": user_query}\n        await __event_emitter__(\n            {\n                \"type\": \"status\",  # We set the type here\n                \"data\": {\n                    \"description\": \"Query sent to GraphRAG backend...\",\n                    \"done\": False,\n                    \"hidden\": False,\n                },\n                # Note done is False here indicating we are still emitting statuses\n            }\n        )\n        headers = {\"Content-Type\": \"application/json\"}\n        URL = self.microsvc + \"/context\"\n        response = requests.post(URL, headers=headers, json=body)\n        await __event_emitter__(\n            {\n                \"type\": \"status\",  # We set the type here\n                \"data\": {\n                    \"description\": \"Invoking Graph Rag Backend ...\",\n                    \"done\": False,\n                    \"hidden\": False,\n                },\n                # Note done is False here indicating we are still emitting statuses\n            }\n        )\n        if response.status_code == 200:\n            result = response.json()[\"response\"]\n            # Parse the JSON response and pretty print it\n            await __event_emitter__(\n                {\n                    \"type\": \"status\",  # We set the type here\n                    \"data\": {\n                        \"description\": \"Graph RAG Result parsed\" + str(result),\n                        \"done\": True,\n                        \"hidden\": False,\n                    },\n                    # Note done is False here indicating we are still emitting statuses\n                }\n            )\n\n            return \"\\n\".join([x[\"Content\"] for x in result])\n        else:\n            await __event_emitter__(\n                {\n                    \"type\": \"status\",  # We set the type here\n                    \"data\": {\n                        \"description\": \"Graph RAG Tool having an Error\",\n                        \"done\": True,\n                        \"hidden\": False,\n                    },\n                    # Note done is False here indicating we are still emitting statuses\n                }\n            )\n            return f\"Error: {response.status_code} - {response.text}\"\n",
+        "specs": [
+            {
+                "name": "query_dataset",
+                "description": "Query with the user question, always use this function.",
+                "parameters": {
+                    "properties": {
+                        "user_query": {
+                            "description": "the query by the user.",
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "user_query"
+                    ],
+                    "type": "object"
+                }
+            }
+        ],
+        "meta": {
+            "description": "Getting context from Graph db",
+            "manifest": {
+                "title": "Query Graph Rag",
+                "author": "Shakudo",
+                "author_url": "https://github.com/shakudo",
+                "version": "0.1.0"
+            }
+        },
+        "access_control": null,
+        "updated_at": 1743184976,
+        "created_at": 1743184368
+    }
+]
