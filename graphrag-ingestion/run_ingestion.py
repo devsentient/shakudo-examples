@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+
+"""
+Simple script to run GraphRAG ingestion
+Usage: python run_ingestion.py
+"""
+
+from graphrag_ingestion import GraphRAGIngestor
+
+def main():
+    print("Starting GraphRAG PDF Ingestion...")
+    print("=" * 50)
+    
+    ingestor = GraphRAGIngestor()
+    
+    bucket_name = "staging"
+    download_dir = "./pdfs"
+
+    try:
+        # Step 1: Download PDFs from S3
+        print(f"Downloading PDFs from bucket '{bucket_name}'...")
+        pdf_files = ingestor.download_pdfs(bucket_name, download_dir)
+        print(f"Downloaded {len(pdf_files)} PDFs to {download_dir}")
+        
+        print("Connecting to Neo4j and Ollama...")
+        ingestor.ingest_all_pdfs(download_dir)
+        print("\n" + "=" * 50)
+        print("✅ Ingestion completed successfully!")
+        print("\nGraph structure created:")
+        print("📄 Document nodes with PDF metadata")
+        print("📝 Chunk nodes with text and embeddings")
+        print("❓ Question nodes with generated questions and embeddings")
+        print("🔗 Relationships: Document -> Chunk -> Question")
+        
+    except Exception as e:
+        print(f"❌ Error during ingestion: {e}")
+        print("\nPlease check:")
+        print("- Neo4j is running at bolt://neo4j.hyperplane-neo4j:7687")
+        print("- Ollama is running with models: nomic-embed-text:latest and granite-3.3-8b-instruct-Q6_K_L:latest")
+        print("- PDF files are present in the current directory")
+        
+    finally:
+        ingestor.close()
+
+if __name__ == "__main__":
+    main()

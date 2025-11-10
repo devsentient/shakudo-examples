@@ -1,0 +1,157 @@
+#!/usr/bin/env python3
+
+"""
+Example query script for GraphRAG system
+Shows how to query the knowledge graph using semantic similarity
+"""
+
+import ollama
+from neo4j import GraphDatabase
+from typing import List, Dict
+
+class GraphRAGQuerier:
+    def __init__(self):
+        self.driver = GraphDatabase.driver(
+            "bolt://neo4j.hyperplane-neo4j:7687", 
+            auth=("neo4j", "Shakudo312!")
+        )
+        self.embedding_model = "nomic-embed-text:latest"
+        self.chat_model = "granite-3.3-8b-instruct-Q6_K_L:latest"
+        
+        # Configure Ollama client with custom endpoint
+        ollama.client.host = "http://ollama-1.hyperplane-ollama-gpu-1.svc.cluster.local:11434"
+    
+    def get_embedding(self, text: str) -> List[float]:
+        """Get embedding from Ollama"""
+        try:
+            response = ollama.embeddings(
+                model=self.embedding_model,
+                prompt=text
+            )
+            return response['embedding']
+        except Exception as e:
+            print(f"Error getting embedding: {e}")
+            return []
+    
+    def search_similar_chunks(self, query: str, limit: int = 5) -> List[Dict]:
+        """Search for similar chunks using vector similarity"""
+        query_embedding = self.get_embedding(query)
+        if not query_embedding:
+            return []
+        
+        with self.driver.session() as session:
+            result = session.run("""
+                CALL db.index.vector.queryNodes('chunk_embedding', $limit, $query_embedding)
+                YIELD node, score
+                MATCH (d:Document)-[:HAS_CHUNK]->(node)
+                RETURN node.text as chunk_text, 
+                       d.name as document_name,
+                       node.chunk_index as chunk_index,
+                       score
+                ORDER BY score DESC
+            """, query_embedding=query_embedding, limit=limit)
+            
+            return [dict(record) for record in result]
+    
+    def search_similar_questions(self, query: str, limit: int = 5) -> List[Dict]:
+        """Search for similar questions using vector similarity"""
+        query_embedding = self.get_embedding(query)
+        if not query_embedding:
+            return []
+        
+        with self.driver.session() as session:
+            result = session.run("""
+                CALL db.index.vector.queryNodes('question_embedding', $limit, $query_embedding)
+                YIELD node, score
+                MATCH (d:Document)-[:HAS_CHUNK]->(c:Chunk)-[:HAS_QUESTION]->(node)
+                RETURN node.text as question_text,
+                       c.text as chunk_text,
+                       d.name as document_name,
+                       c.chunk_index as chunk_index,
+                       score
+                ORDER BY score DESC
+            """, query_embedding=query_embedding, limit=limit)
+            
+            return [dict(record) for record in result]
+    
+    def answer_question(self, query: str) -> str:
+        """Answer a question using retrieved context"""
+        # Get relevant chunks
+        chunks = self.search_similar_chunks(query, limit=3)
+        
+        if not chunks:
+            return "No relevant information found."
+        
+        # Build context from top chunks
+        context = "\n\n".join([
+            f"Document: {chunk['document_name']}\nChunk {chunk['chunk_index']}: {chunk['chunk_text']}"
+            for chunk in chunks
+        ])
+        
+        # Generate answer using LLM
+        prompt = f"""Based on the following context, please answer the question: "{query}"
+
+Context:
+{context}
+
+Answer:"""
+        
+        try:
+            response = ollama.chat(
+                model=self.chat_model,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            return response['message']['content']
+        except Exception as e:
+            return f"Error generating answer: {e}"
+    
+    def close(self):
+        """Close Neo4j driver"""
+        self.driver.close()
+
+def main():
+    """Example usage of the querier"""
+    querier = GraphRAGQuerier()
+    
+    try:
+        print("GraphRAG Query Example")
+        print("=" * 30)
+        
+        # Example queries
+        example_queries = [
+            "What are the main topics discussed?",
+            "What are the key findings?",
+            "What methodology was used?"
+        ]
+        
+        for query in example_queries:
+            print(f"\nQuery: {query}")
+            print("-" * 40)
+            
+            # Search similar chunks
+            chunks = querier.search_similar_chunks(query, limit=2)
+            print(f"Found {len(chunks)} relevant chunks:")
+            for i, chunk in enumerate(chunks, 1):
+                print(f"{i}. {chunk['document_name']} (chunk {chunk['chunk_index']}) - Score: {chunk['score']:.3f}")
+                print(f"   Text: {chunk['chunk_text'][:100]}...")
+            
+            # Search similar questions
+            questions = querier.search_similar_questions(query, limit=2)
+            print(f"\nFound {len(questions)} relevant questions:")
+            for i, q in enumerate(questions, 1):
+                print(f"{i}. {q['question_text']} - Score: {q['score']:.3f}")
+            
+            # Generate answer
+            answer = querier.answer_question(query)
+            print(f"\nGenerated Answer:\n{answer}")
+            print("\n" + "=" * 60)
+    
+    except Exception as e:
+        print(f"Error during querying: {e}")
+    finally:
+        querier.close()
+
+if __name__ == "__main__":
+    main()
