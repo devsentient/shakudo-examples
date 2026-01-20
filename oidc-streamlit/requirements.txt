@@ -1,0 +1,3 @@
+streamlit>=1.29
+requests>=2.31
+pyjwt>=2.8

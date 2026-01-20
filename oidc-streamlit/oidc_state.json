@@ -1,0 +1,331 @@
+{
+  "auth_request": {
+    "auth_url": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/auth?client_id=istio&response_type=code&scope=openid+profile+email+n8n&redirect_uri=http%3A%2F%2Flocalhost%3A8501&state=6lxc0SyvnM51pc-5wtSHRQ&nonce=SSbRin5rWOfdZbH83SnfGQ&code_challenge=X2VrHD3Q4pSrXxuD3Z2qsu-0YOJ7MGrqnZlTK7sPwVc&code_challenge_method=S256",
+    "code_verifier": "Cd1ViMambOkALuk3vmnH9HEhpWX4XPEKEfp63kSK79w",
+    "nonce": "SSbRin5rWOfdZbH83SnfGQ",
+    "state": "6lxc0SyvnM51pc-5wtSHRQ"
+  },
+  "client_id": "istio",
+  "client_secret": "test",
+  "discovery": {
+    "acr_values_supported": [
+      "0",
+      "1"
+    ],
+    "authorization_encryption_alg_values_supported": [
+      "RSA-OAEP",
+      "RSA-OAEP-256",
+      "RSA1_5"
+    ],
+    "authorization_encryption_enc_values_supported": [
+      "A256GCM",
+      "A192GCM",
+      "A128GCM",
+      "A128CBC-HS256",
+      "A192CBC-HS384",
+      "A256CBC-HS512"
+    ],
+    "authorization_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/auth",
+    "authorization_response_iss_parameter_supported": true,
+    "authorization_signing_alg_values_supported": [
+      "PS384",
+      "RS384",
+      "EdDSA",
+      "ES384",
+      "HS256",
+      "HS512",
+      "ES256",
+      "RS256",
+      "HS384",
+      "ES512",
+      "PS256",
+      "PS512",
+      "RS512"
+    ],
+    "backchannel_authentication_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/ext/ciba/auth",
+    "backchannel_authentication_request_signing_alg_values_supported": [
+      "PS384",
+      "RS384",
+      "EdDSA",
+      "ES384",
+      "ES256",
+      "RS256",
+      "ES512",
+      "PS256",
+      "PS512",
+      "RS512"
+    ],
+    "backchannel_logout_session_supported": true,
+    "backchannel_logout_supported": true,
+    "backchannel_token_delivery_modes_supported": [
+      "poll",
+      "ping"
+    ],
+    "check_session_iframe": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/login-status-iframe.html",
+    "claim_types_supported": [
+      "normal"
+    ],
+    "claims_parameter_supported": true,
+    "claims_supported": [
+      "aud",
+      "sub",
+      "iss",
+      "auth_time",
+      "name",
+      "given_name",
+      "family_name",
+      "preferred_username",
+      "email",
+      "acr"
+    ],
+    "code_challenge_methods_supported": [
+      "plain",
+      "S256"
+    ],
+    "device_authorization_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/auth/device",
+    "end_session_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/logout",
+    "frontchannel_logout_session_supported": true,
+    "frontchannel_logout_supported": true,
+    "grant_types_supported": [
+      "authorization_code",
+      "implicit",
+      "refresh_token",
+      "password",
+      "client_credentials",
+      "urn:openid:params:grant-type:ciba",
+      "urn:ietf:params:oauth:grant-type:device_code"
+    ],
+    "id_token_encryption_alg_values_supported": [
+      "RSA-OAEP",
+      "RSA-OAEP-256",
+      "RSA1_5"
+    ],
+    "id_token_encryption_enc_values_supported": [
+      "A256GCM",
+      "A192GCM",
+      "A128GCM",
+      "A128CBC-HS256",
+      "A192CBC-HS384",
+      "A256CBC-HS512"
+    ],
+    "id_token_signing_alg_values_supported": [
+      "PS384",
+      "RS384",
+      "EdDSA",
+      "ES384",
+      "HS256",
+      "HS512",
+      "ES256",
+      "RS256",
+      "HS384",
+      "ES512",
+      "PS256",
+      "PS512",
+      "RS512"
+    ],
+    "introspection_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/token/introspect",
+    "introspection_endpoint_auth_methods_supported": [
+      "private_key_jwt",
+      "client_secret_basic",
+      "client_secret_post",
+      "tls_client_auth",
+      "client_secret_jwt"
+    ],
+    "introspection_endpoint_auth_signing_alg_values_supported": [
+      "PS384",
+      "RS384",
+      "EdDSA",
+      "ES384",
+      "HS256",
+      "HS512",
+      "ES256",
+      "RS256",
+      "HS384",
+      "ES512",
+      "PS256",
+      "PS512",
+      "RS512"
+    ],
+    "issuer": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane",
+    "jwks_uri": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/certs",
+    "mtls_endpoint_aliases": {
+      "backchannel_authentication_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/ext/ciba/auth",
+      "device_authorization_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/auth/device",
+      "introspection_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/token/introspect",
+      "pushed_authorization_request_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/ext/par/request",
+      "registration_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/clients-registrations/openid-connect",
+      "revocation_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/revoke",
+      "token_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/token",
+      "userinfo_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/userinfo"
+    },
+    "pushed_authorization_request_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/ext/par/request",
+    "registration_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/clients-registrations/openid-connect",
+    "request_object_encryption_alg_values_supported": [
+      "RSA-OAEP",
+      "RSA-OAEP-256",
+      "RSA1_5"
+    ],
+    "request_object_encryption_enc_values_supported": [
+      "A256GCM",
+      "A192GCM",
+      "A128GCM",
+      "A128CBC-HS256",
+      "A192CBC-HS384",
+      "A256CBC-HS512"
+    ],
+    "request_object_signing_alg_values_supported": [
+      "PS384",
+      "RS384",
+      "EdDSA",
+      "ES384",
+      "HS256",
+      "HS512",
+      "ES256",
+      "RS256",
+      "HS384",
+      "ES512",
+      "PS256",
+      "PS512",
+      "RS512",
+      "none"
+    ],
+    "request_parameter_supported": true,
+    "request_uri_parameter_supported": true,
+    "require_pushed_authorization_requests": false,
+    "require_request_uri_registration": true,
+    "response_modes_supported": [
+      "query",
+      "fragment",
+      "form_post",
+      "query.jwt",
+      "fragment.jwt",
+      "form_post.jwt",
+      "jwt"
+    ],
+    "response_types_supported": [
+      "code",
+      "none",
+      "id_token",
+      "token",
+      "id_token token",
+      "code id_token",
+      "code token",
+      "code id_token token"
+    ],
+    "revocation_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/revoke",
+    "revocation_endpoint_auth_methods_supported": [
+      "private_key_jwt",
+      "client_secret_basic",
+      "client_secret_post",
+      "tls_client_auth",
+      "client_secret_jwt"
+    ],
+    "revocation_endpoint_auth_signing_alg_values_supported": [
+      "PS384",
+      "RS384",
+      "EdDSA",
+      "ES384",
+      "HS256",
+      "HS512",
+      "ES256",
+      "RS256",
+      "HS384",
+      "ES512",
+      "PS256",
+      "PS512",
+      "RS512"
+    ],
+    "scopes_supported": [
+      "openid",
+      "offline_access",
+      "web-origins",
+      "address",
+      "microprofile-jwt",
+      "phone",
+      "acr",
+      "groups",
+      "profile",
+      "roles",
+      "email",
+      "n8n"
+    ],
+    "subject_types_supported": [
+      "public",
+      "pairwise"
+    ],
+    "tls_client_certificate_bound_access_tokens": true,
+    "token_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/token",
+    "token_endpoint_auth_methods_supported": [
+      "private_key_jwt",
+      "client_secret_basic",
+      "client_secret_post",
+      "tls_client_auth",
+      "client_secret_jwt"
+    ],
+    "token_endpoint_auth_signing_alg_values_supported": [
+      "PS384",
+      "RS384",
+      "EdDSA",
+      "ES384",
+      "HS256",
+      "HS512",
+      "ES256",
+      "RS256",
+      "HS384",
+      "ES512",
+      "PS256",
+      "PS512",
+      "RS512"
+    ],
+    "userinfo_encryption_alg_values_supported": [
+      "RSA-OAEP",
+      "RSA-OAEP-256",
+      "RSA1_5"
+    ],
+    "userinfo_encryption_enc_values_supported": [
+      "A256GCM",
+      "A192GCM",
+      "A128GCM",
+      "A128CBC-HS256",
+      "A192CBC-HS384",
+      "A256CBC-HS512"
+    ],
+    "userinfo_endpoint": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/protocol/openid-connect/userinfo",
+    "userinfo_signing_alg_values_supported": [
+      "PS384",
+      "RS384",
+      "EdDSA",
+      "ES384",
+      "HS256",
+      "HS512",
+      "ES256",
+      "RS256",
+      "HS384",
+      "ES512",
+      "PS256",
+      "PS512",
+      "RS512",
+      "none"
+    ]
+  },
+  "discovery_url": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane/.well-known/openid-configuration",
+  "last_query_params": {
+    "code": "fdde0702-9fa4-47f4-99e7-5cebf6923751.666fce1a-78ce-440d-85a9-86f2a0220144.370682a3-a06c-4fea-bfb0-002ea18b7293",
+    "iss": "https://umang-shakudo.canopyhub.io/auth/realms/Hyperplane",
+    "session_state": "666fce1a-78ce-440d-85a9-86f2a0220144",
+    "state": "6lxc0SyvnM51pc-5wtSHRQ"
+  },
+  "redirect_uri": "http://localhost:8501",
+  "scopes": "openid profile email n8n",
+  "token_response": {
+    "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJmNDVnaG1pNUxFbzFsSERBRGg0LXoweGdvR0FxTFVCUkFVNUVSaE0zRFNjIn0.eyJleHAiOjE3Njg5MzI5NTYsImlhdCI6MTc2ODg0NjU1NiwiYXV0aF90aW1lIjoxNzY4NTA5MzM4LCJqdGkiOiI5Yzc5NjZjYi00MThmLTQyMDktYWVmNi1lM2ZlOTg0NGVlMDUiLCJpc3MiOiJodHRwczovL3VtYW5nLXNoYWt1ZG8uY2Fub3B5aHViLmlvL2F1dGgvcmVhbG1zL0h5cGVycGxhbmUiLCJhdWQiOlsiaXN0aW8iLCJhY2NvdW50Il0sInN1YiI6ImVmNDk0N2Y5LTk1MjAtNDU5My1iOGJjLTVhNWE4YWNlYzM5OCIsInR5cCI6IkJlYXJlciIsImF6cCI6ImlzdGlvIiwibm9uY2UiOiJTU2JSaW41cldPZmRaYkg4M1NuZkdRIiwic2Vzc2lvbl9zdGF0ZSI6IjY2NmZjZTFhLTc4Y2UtNDQwZC04NWE5LTg2ZjJhMDIyMDE0NCIsImFjciI6IjAiLCJhbGxvd2VkLW9yaWdpbnMiOlsiKiJdLCJyZXNvdXJjZV9hY2Nlc3MiOnsiaXN0aW8iOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtaHlwZXJwbGFuZSJdfSwiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBncm91cHMgZW1haWwiLCJzaWQiOiI2NjZmY2UxYS03OGNlLTQ0MGQtODVhOS04NmYyYTAyMjAxNDQiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibjhuX2luc3RhbmNlX3JvbGUiOiJnbG9iYWw6YWRtaW4iLCJuYW1lIjoiWWlyYW4gV2FuZyIsInByZWZlcnJlZF91c2VybmFtZSI6InlpcmFuQHNoYWt1ZG8uaW8iLCJnaXZlbl9uYW1lIjoiWWlyYW4iLCJmYW1pbHlfbmFtZSI6IldhbmciLCJlbWFpbCI6InlpcmFuQHNoYWt1ZG8uaW8ifQ.ZI6U_1q1YHXOXrk7iUfJp616MBaVjkT28QqCFyDwcUO7DlgIiQ7du3jC7AzYoRnzclwODbaVHRAdc2_KIdugkoNJBY-2RG-LYB4wjIiG883wuWf2JS7xvf9sZPlzfD6ao7LPfNBWPIUvgJBChs7721oTzkRyZUqM-d8bQUqaRCzOmj8HfscS3UmzWA3e_C6_I2DsfgIWCHkYdRM3e7xFHRIlRHCQaLao_tbNx8ByKBJvKMEQcDJdYkPQbFlxIt1US0aM6FJsGfWKRSCt8to17ywt4lLsgr_jBHugxgYtdhLAheiA_glgj3EZ8MgwCdCcBDR80K6EZZpP0p9axV9rxw",
+    "expires_in": 86400,
+    "id_token": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJmNDVnaG1pNUxFbzFsSERBRGg0LXoweGdvR0FxTFVCUkFVNUVSaE0zRFNjIn0.eyJleHAiOjE3Njg5MzI5NTYsImlhdCI6MTc2ODg0NjU1NiwiYXV0aF90aW1lIjoxNzY4NTA5MzM4LCJqdGkiOiI5NzUzZGJhYS1hYTE0LTQxZDEtOTJjOS1hZDAwYjY1ODEwMTciLCJpc3MiOiJodHRwczovL3VtYW5nLXNoYWt1ZG8uY2Fub3B5aHViLmlvL2F1dGgvcmVhbG1zL0h5cGVycGxhbmUiLCJhdWQiOiJpc3RpbyIsInN1YiI6ImVmNDk0N2Y5LTk1MjAtNDU5My1iOGJjLTVhNWE4YWNlYzM5OCIsInR5cCI6IklEIiwiYXpwIjoiaXN0aW8iLCJub25jZSI6IlNTYlJpbjVyV09mZFpiSDgzU25mR1EiLCJzZXNzaW9uX3N0YXRlIjoiNjY2ZmNlMWEtNzhjZS00NDBkLTg1YTktODZmMmEwMjIwMTQ0IiwiYXRfaGFzaCI6Ii1sYVluUTd3ZXRtMEREaTFZX3lSWWciLCJhY3IiOiIwIiwic2lkIjoiNjY2ZmNlMWEtNzhjZS00NDBkLTg1YTktODZmMmEwMjIwMTQ0IiwicmVzb3VyY2VfYWNjZXNzIjp7ImlzdGlvIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJkZWZhdWx0LXJvbGVzLWh5cGVycGxhbmUiXX19LCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibjhuX2luc3RhbmNlX3JvbGUiOiJnbG9iYWw6YWRtaW4iLCJuYW1lIjoiWWlyYW4gV2FuZyIsInByZWZlcnJlZF91c2VybmFtZSI6InlpcmFuQHNoYWt1ZG8uaW8iLCJnaXZlbl9uYW1lIjoiWWlyYW4iLCJmYW1pbHlfbmFtZSI6IldhbmciLCJlbWFpbCI6InlpcmFuQHNoYWt1ZG8uaW8ifQ.XTnfXcGK-z2oAK7GtQ5G7d_svRFKeHeEwbHsBqGreyZcetD3D0toomzoScD0qXsrv7uksCXu0FmOJbW9jmXgccw_GWQ28mDfQ9OqHqgIFYt2hyDyRyckWco_bFkIr4NiJoaLAc87dsLdQoeN-xELF5LZBHDJFtdV4kRemkr9h4oQ6MjnUyaWH0WSfsBhw2atJwKTZEqlyBuhkvb13TzmAuDyAJIcVJXg0QYueXwJZWm7_vbG9qovOoovjMQ3aDy5Qz4LSBTOiMIfYobNlbY5HuaIrvV4ANLj8IMNAz5MEe6J5eZBkGFG8sxCKUPfqS5OvhUkYC1F9V_ffsib-HRDLA",
+    "not-before-policy": 0,
+    "refresh_expires_in": 604800,
+    "refresh_token": "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyNGY0Mzk5MC1kMDhjLTRjOGItOTk4NS00NzhmYzBmZTVkMzIifQ.eyJleHAiOjE3Njk0NTEzNTYsImlhdCI6MTc2ODg0NjU1NiwianRpIjoiMzU4YTEzODUtNTQ4Yy00N2YzLTk5MzYtZjk5YTFiZWQzZDQ4IiwiaXNzIjoiaHR0cHM6Ly91bWFuZy1zaGFrdWRvLmNhbm9weWh1Yi5pby9hdXRoL3JlYWxtcy9IeXBlcnBsYW5lIiwiYXVkIjoiaHR0cHM6Ly91bWFuZy1zaGFrdWRvLmNhbm9weWh1Yi5pby9hdXRoL3JlYWxtcy9IeXBlcnBsYW5lIiwic3ViIjoiZWY0OTQ3ZjktOTUyMC00NTkzLWI4YmMtNWE1YThhY2VjMzk4IiwidHlwIjoiUmVmcmVzaCIsImF6cCI6ImlzdGlvIiwibm9uY2UiOiJTU2JSaW41cldPZmRaYkg4M1NuZkdRIiwic2Vzc2lvbl9zdGF0ZSI6IjY2NmZjZTFhLTc4Y2UtNDQwZC04NWE5LTg2ZjJhMDIyMDE0NCIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZ3JvdXBzIGVtYWlsIiwic2lkIjoiNjY2ZmNlMWEtNzhjZS00NDBkLTg1YTktODZmMmEwMjIwMTQ0In0.3Sr4Y-g-9VBorRd1TlOn1hFOYOUAjdhY_rE8Wb0oYHBJU5azWo3j3KTFdxacTMOrzcjGCyptdo7JdYWyLZWJdg",
+    "scope": "openid profile groups email",
+    "session_state": "666fce1a-78ce-440d-85a9-86f2a0220144",
+    "token_type": "Bearer"
+  }
+}
