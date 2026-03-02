@@ -89,3 +89,68 @@ async def exec_sql(language: str, sqlCode: str):
     else:
         table = ""
     return table
+
+
+def load_glossary() -> dict | None:
+    """
+    Load business glossary from JSON/YAML file.
+    Glossary maps business terms to database entities.
+
+    Expected format:
+    {
+        "terms": {
+            "donation": {"tables": ["donations", "gifts"], "columns": ["amount", "donor_id"]},
+            "donor": {"tables": ["donors", "contacts"], "columns": ["name", "email"]}
+        },
+        "table_descriptions": {
+            "donations": "Records of all donations received",
+            "donors": "Contact information for donors"
+        }
+    }
+    """
+    glossary_path = os.environ.get("GLOSSARY_PATH", "glossary.json")
+
+    if not os.path.exists(glossary_path):
+        alt_paths = [
+            "/app/glossary.json",
+            "/tmp/git/monorepo/glossary.json",
+            os.path.join(os.path.dirname(__file__), "..", "glossary.json"),
+        ]
+        for alt in alt_paths:
+            if os.path.exists(alt):
+                glossary_path = alt
+                break
+        else:
+            return None
+
+    try:
+        with open(glossary_path, "r") as f:
+            if glossary_path.endswith(".yaml") or glossary_path.endswith(".yml"):
+                import yaml
+
+                return yaml.safe_load(f)
+            else:
+                return json.load(f)
+    except Exception as e:
+        print(f"Warning: Could not load glossary from {glossary_path}: {e}")
+        return None
+
+
+def format_database_structure(db_structure: dict) -> str:
+    """
+    Format database structure for LLM consumption.
+
+    Input: {schema_name: {table_name: [columns]}}
+    Output: Human-readable string format
+    """
+    lines = []
+    for schema_name, tables in db_structure.items():
+        lines.append(f"\n=== Schema: {schema_name} ===")
+        for table_name, columns in tables.items():
+            cols_preview = columns[:10]
+            if len(columns) > 10:
+                cols_str = ", ".join(cols_preview) + f"... (+{len(columns) - 10} more)"
+            else:
+                cols_str = ", ".join(cols_preview)
+            lines.append(f"  {table_name}: [{cols_str}]")
+    return "\n".join(lines)

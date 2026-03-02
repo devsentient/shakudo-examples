@@ -1,0 +1,47 @@
+{
+    "_description": "Business glossary mapping common terms to database entities. Copy to glossary.json and customize.",
+    "terms": {
+        "donation": {
+            "tables": ["donations", "gifts", "contributions"],
+            "columns": ["amount", "donation_amount", "gift_amount", "contribution_amount"],
+            "description": "Financial contributions made to the organization"
+        },
+        "donor": {
+            "tables": ["donors", "contacts", "constituents", "supporters"],
+            "columns": ["donor_name", "contact_name", "first_name", "last_name", "full_name"],
+            "description": "People or organizations who have made donations"
+        },
+        "gift": {
+            "tables": ["donations", "gifts"],
+            "columns": ["gift_amount", "gift_date", "gift_type"],
+            "description": "Synonym for donation"
+        },
+        "member": {
+            "tables": ["members", "memberships", "constituents"],
+            "columns": ["member_id", "membership_level", "member_since"],
+            "description": "Organization members"
+        },
+        "event": {
+            "tables": ["events", "activities", "programs"],
+            "columns": ["event_name", "event_date", "event_type"],
+            "description": "Fundraising events and activities"
+        },
+        "pledge": {
+            "tables": ["pledges", "commitments"],
+            "columns": ["pledge_amount", "pledge_date", "pledge_status"],
+            "description": "Promised future donations"
+        }
+    },
+    "table_descriptions": {
+        "donations": "Records of all donations received by the organization",
+        "donors": "Contact information and history for all donors",
+        "members": "Membership records and status",
+        "events": "Fundraising events and activities",
+        "pledges": "Committed but not yet received donations"
+    },
+    "common_queries": {
+        "total_donations": "Sum of donation amounts, typically filtered by date range",
+        "donor_history": "All donations made by a specific donor over time",
+        "event_revenue": "Total donations associated with specific events"
+    }
+}

@@ -2,8 +2,7 @@ import json
 import os
 
 import psycopg as pg
-from psycopg2 import (DatabaseError, DataError, OperationalError,
-                      ProgrammingError)
+from psycopg2 import DatabaseError, DataError, OperationalError, ProgrammingError
 from psycopg.rows import dict_row
 
 from connections.base import DatabaseConnection
@@ -15,10 +14,10 @@ host = os.environ.get("POSTGRES_HOST", default_postgres)
 user = os.environ.get("POSTGRES_USER", "supabase_admin")
 port = os.environ.get("POSTGRES_PORT", "5432")
 password = os.environ.get("HYPERPLANE_CUSTOM_SECRET_KEY_POSTGRES_PSWD", "postgres")
-source_type = os.environ.get("SOURCE_TYPE","supabase")
+source_type = os.environ.get("SOURCE_TYPE", "supabase")
 conninfo = f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
 if "CLIENT_ENCODING" in os.environ:
-    conninfo += f"?client_encoding={os.environ.get('CLIENT_ENCODING','utf8')}"
+    conninfo += f"?client_encoding={os.environ.get('CLIENT_ENCODING', 'utf8')}"
 MAX_DB_RET = 60
 
 
@@ -44,17 +43,20 @@ def tables_parse(tables):
             res[t["table_name"]].append(t["column_name"])
     return res
 
+
 ### Start psql definations
 async def is_valid_psql_query(query):
     conn = None
     try:
-        async with await pg.AsyncConnection.connect(conninfo, row_factory=dict_row) as conn:
+        async with await pg.AsyncConnection.connect(
+            conninfo, row_factory=dict_row
+        ) as conn:
             try:
                 async with conn.cursor() as cur:
                     await cur.execute(
                         "EXPLAIN " + query
                     )  # Use EXPLAIN to check the query plan without execution
-                return {"status": "ok", "message":""}
+                return {"status": "ok", "message": ""}
             except pg.Error as e:
                 print(f"SQL Error: {e}")
                 return {"status": "failed", "message": e}
@@ -64,19 +66,19 @@ async def is_valid_psql_query(query):
         if conn:
             await conn.close()
 
-async def get_psql_schemas(GET_SCHEMA_SQL:str):
+
+async def get_psql_schemas(GET_SCHEMA_SQL: str):
     conn = await pg.AsyncConnection.connect(conninfo, row_factory=dict_row)
     async with conn:
         async with conn.cursor() as cur:
-            await cur.execute(
-               GET_SCHEMA_SQL
-            )
+            await cur.execute(GET_SCHEMA_SQL)
             fetched = await cur.fetchmany(500)
             keys = list(fetched[0].keys()) if len(fetched) > 0 else []
             keeping = keys[:]
             limited = [{k: f[k] for k in keeping} for f in fetched]
             limited = [x["schema_name"] for x in limited]
     return limited
+
 
 async def exec_psql_no_ret(sqlCode: str):
     err = True
@@ -111,7 +113,8 @@ async def exec_psql_no_ret(sqlCode: str):
         "context": ret,
     }
 
-async def get_table_specs(tables,GET_TABLE_SPECS_SQL,schema=None):
+
+async def get_table_specs(tables, GET_TABLE_SPECS_SQL, schema=None):
     conn = await pg.AsyncConnection.connect(conninfo, row_factory=dict_row)
     async with conn:
         async with conn.cursor() as cur:
@@ -126,14 +129,12 @@ async def get_table_specs(tables,GET_TABLE_SPECS_SQL,schema=None):
                     (t,),
                 )
                 table_spec[t] = [
-                    (d["column_name"], d["data_type"])
-                    for d in (await cur.fetchall())
+                    (d["column_name"], d["data_type"]) for d in (await cur.fetchall())
                 ][:]
     return table_spec, None
 
-async def exec_psql(
-    sqlCode: str
-):
+
+async def exec_psql(sqlCode: str):
     err = True
     conn = None
     try:
@@ -176,7 +177,8 @@ async def exec_psql(
         "context": ret,
     }
 
-async def get_tables_psql(schema,TABLE_PULLING_SQL):
+
+async def get_tables_psql(schema, TABLE_PULLING_SQL):
     conn = False
     try:
         conn = await pg.AsyncConnection.connect(conninfo, row_factory=dict_row)
@@ -193,30 +195,110 @@ async def get_tables_psql(schema,TABLE_PULLING_SQL):
     return parsed
 
 
+# System schemas to exclude when fetching all tables
+SYSTEM_SCHEMAS = {
+    "pg_catalog",
+    "information_schema",
+    "pg_toast",
+    "pg_temp_1",
+    "pg_toast_temp_1",
+    "auth",
+    "storage",
+    "graphql",
+    "graphql_public",
+    "realtime",
+    "supabase_functions",
+    "supabase_migrations",
+    "extensions",
+    "vault",
+    "pgsodium",
+    "pgsodium_masks",
+    "_realtime",
+    "net",
+    "cron",
+}
+
+
+async def get_all_tables_all_schemas_psql(
+    GET_SCHEMA_SQL: str, TABLE_PULLING_SQL: str, exclude_system_schemas: bool = True
+):
+    """
+    Fetches all tables from all schemas.
+    Returns: {schema_name: {table_name: [column1, column2, ...]}}
+    """
+    conn = None
+    result = {}
+    try:
+        conn = await pg.AsyncConnection.connect(conninfo, row_factory=dict_row)
+        async with conn:
+            async with conn.cursor() as cur:
+                # Get all schemas
+                await cur.execute(GET_SCHEMA_SQL)
+                schemas_raw = await cur.fetchall()
+                schemas = [row["schema_name"] for row in schemas_raw]
+
+                # Filter out system schemas if requested
+                if exclude_system_schemas:
+                    schemas = [s for s in schemas if s not in SYSTEM_SCHEMAS]
+
+                # Get tables for each schema
+                for schema in schemas:
+                    try:
+                        await cur.execute(TABLE_PULLING_SQL.format(schema))
+                        tables = await cur.fetchall()
+                        parsed = tables_parse(tables)
+                        if parsed:  # Only include schemas that have tables
+                            result[schema] = parsed
+                    except Exception as schema_err:
+                        # Log but continue with other schemas
+                        print(
+                            f"Warning: Could not fetch tables for schema '{schema}': {schema_err}"
+                        )
+                        continue
+    except Exception as e:
+        raise e
+    finally:
+        if conn:
+            await conn.close()
+    return result
+
+
 class PostgreSQLConnection(DatabaseConnection):
-    def __init__(self, conninfo:str = conninfo, source_type:str = source_type):
+    def __init__(self, conninfo: str = conninfo, source_type: str = source_type):
         self.conninfo = conninfo
         self.source_type = source_type
-        self.TABLE_PULLING_SQL, self.GET_SCHEMA_SQL, self.GET_TABLE_SPECS_SQL = get_sql_templates(self.source_type)
+        self.TABLE_PULLING_SQL, self.GET_SCHEMA_SQL, self.GET_TABLE_SPECS_SQL = (
+            get_sql_templates(self.source_type)
+        )
 
     async def get_schema(self):
-        return await get_psql_schemas(GET_SCHEMA_SQL = self.GET_SCHEMA_SQL)
-    
+        return await get_psql_schemas(GET_SCHEMA_SQL=self.GET_SCHEMA_SQL)
+
     async def validate_query(self, query):
         return await is_valid_psql_query(query)
-    
+
     async def exec_query_with_ret(self, query):
         return await exec_psql(query)
 
     async def exec_query_without_ret(self, query):
         return await exec_psql_no_ret(query)
-    
+
     async def get_tables(self, schema):
-        return await get_tables_psql(schema,TABLE_PULLING_SQL=self.TABLE_PULLING_SQL)
+        return await get_tables_psql(schema, TABLE_PULLING_SQL=self.TABLE_PULLING_SQL)
 
     async def get_table_specs(self, tables, schema=None):
-        if self.source_type=="redshift_psql":
-            return await get_table_specs(tables,GET_TABLE_SPECS_SQL=self.GET_TABLE_SPECS_SQL,schema=schema)
-        else: ##TODO: Use schema in supabase postgres for pulling get_table_specs
-            return await get_table_specs(tables,GET_TABLE_SPECS_SQL=self.GET_TABLE_SPECS_SQL)
+        if self.source_type == "redshift_psql":
+            return await get_table_specs(
+                tables, GET_TABLE_SPECS_SQL=self.GET_TABLE_SPECS_SQL, schema=schema
+            )
+        else:  ##TODO: Use schema in supabase postgres for pulling get_table_specs
+            return await get_table_specs(
+                tables, GET_TABLE_SPECS_SQL=self.GET_TABLE_SPECS_SQL
+            )
 
+    async def get_all_tables_all_schemas(self, exclude_system_schemas: bool = True):
+        return await get_all_tables_all_schemas_psql(
+            GET_SCHEMA_SQL=self.GET_SCHEMA_SQL,
+            TABLE_PULLING_SQL=self.TABLE_PULLING_SQL,
+            exclude_system_schemas=exclude_system_schemas,
+        )
